@@ -25,7 +25,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Use default locale - the middleware will handle locale detection
+  // Use default locale - the client-side will handle locale detection
   const locale = defaultLocale;
 
   // Load messages for the current locale
