@@ -16,7 +16,7 @@ export default function middleware(request: NextRequest) {
   const locale = localeCookie?.value;
 
   // If the locale cookie is missing or invalid, set it to the default locale
-  if (!locale || !locales.includes(locale as (typeof locales)[number])) {
+  if (!locale || !locales.includes(locale as any)) {
     // Create a response that sets the cookie
     const response = NextResponse.next();
     response.cookies.set("NEXT_LOCALE", defaultLocale, {
