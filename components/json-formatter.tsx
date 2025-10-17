@@ -4,44 +4,40 @@ import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Code, Minimize2, Copy, AlertCircle } from "lucide-react";
-import { useTranslations } from 'next-intl';
 
 export function JsonFormatter() {
-  const t = useTranslations();
   const [jsonInput, setJsonInput] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const formatJson = () => {
     try {
       if (!jsonInput.trim()) {
-        setError(t('errors.emptyInput', { action: t('actions.format').toLowerCase() }));
+        setError("Please enter JSON to format");
         return;
       }
-
+      
       const parsedJson = JSON.parse(jsonInput);
       const formattedJson = JSON.stringify(parsedJson, null, 2);
       setJsonInput(formattedJson);
       setError(null);
     } catch (err) {
-      console.log((err as Error).message);
-      setError(t('errors.invalidJson'));
+      setError(`Invalid JSON: ${(err as Error).message}`);
     }
   };
 
   const minifyJson = () => {
     try {
       if (!jsonInput.trim()) {
-        setError(t('errors.emptyInput', { action: t('actions.minify').toLowerCase() }));
+        setError("Please enter JSON to minify");
         return;
       }
-
+      
       const parsedJson = JSON.parse(jsonInput);
       const minifiedJson = JSON.stringify(parsedJson);
       setJsonInput(minifiedJson);
       setError(null);
     } catch (err) {
-      console.log((err as Error).message);
-      setError(t('errors.invalidJson'));
+      setError(`Invalid JSON: ${(err as Error).message}`);
     }
   };
 
@@ -53,31 +49,31 @@ export function JsonFormatter() {
     <div className="w-full max-w-3xl flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">{t('app.title')}</h1>
+          <h1 className="text-2xl font-bold">jsonance</h1>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
+            <Button 
+              variant="outline" 
+              size="sm" 
               onClick={formatJson}
-              title={t('tooltips.format')}
+              title="Format JSON"
             >
               <Code className="size-4" />
-              <span>{t('actions.format')}</span>
+              <span>Format</span>
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
+            <Button 
+              variant="outline" 
+              size="sm" 
               onClick={minifyJson}
-              title={t('tooltips.minify')}
+              title="Minify JSON"
             >
               <Minimize2 className="size-4" />
-              <span>{t('actions.minify')}</span>
+              <span>Minify</span>
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
+            <Button 
+              variant="outline" 
+              size="sm" 
               onClick={copyToClipboard}
-              title={t('tooltips.copy')}
+              title="Copy to clipboard"
             >
               <Copy className="size-4" />
             </Button>
@@ -90,13 +86,13 @@ export function JsonFormatter() {
           </div>
         )}
       </div>
-      <Textarea
+      <Textarea 
         value={jsonInput}
         onChange={(e) => {
           setJsonInput(e.target.value);
           if (error) setError(null);
         }}
-        placeholder={t('placeholders.jsonInput')}
+        placeholder="Paste your JSON here..."
         className="min-h-[400px] font-mono text-sm"
       />
     </div>
