@@ -7,6 +7,7 @@ import { Code, Minimize2, Copy, AlertCircle, Check, Eye } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { SyntaxHighlighter } from "./syntax-highlighter";
+import { LineNumbers } from "@/components/ui/line-numbers";
 
 export function JsonFormatter() {
   const t = useTranslations();
@@ -177,27 +178,12 @@ export function JsonFormatter() {
         ) : (
           <>
             {/* Line numbers */}
-            <div
+            <LineNumbers
               ref={lineNumbersRef}
-              className="select-none bg-muted/50 text-muted-foreground py-2 pr-2 text-right overflow-hidden border-r"
-              style={{
-                overflowY: "hidden",
-                lineHeight: "1.5rem",
-              }}
-            >
-              {Array.from({ length: lineCount }, (_, i) => (
-                <div
-                  key={i + 1}
-                  className={cn(
-                    "px-2",
-                    currentLine === i + 1 &&
-                      "bg-accent text-accent-foreground font-medium"
-                  )}
-                >
-                  {i + 1}
-                </div>
-              ))}
-            </div>
+              lineCount={lineCount}
+              currentLine={currentLine}
+              lineHeight="1.5rem"
+            />
 
             {/* JSON textarea */}
             <Textarea
