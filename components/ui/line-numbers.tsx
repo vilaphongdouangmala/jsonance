@@ -10,7 +10,10 @@ interface LineNumbersProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const LineNumbers = forwardRef<HTMLDivElement, LineNumbersProps>(
-  ({ lineCount, currentLine = 0, lineHeight = "1.5rem", className, ...props }, ref) => {
+  (
+    { lineCount, currentLine = 0, lineHeight = "1.5rem", className, ...props },
+    ref
+  ) => {
     return (
       <div
         ref={ref}
@@ -29,7 +32,8 @@ const LineNumbers = forwardRef<HTMLDivElement, LineNumbersProps>(
             key={i + 1}
             className={cn(
               "px-2",
-              currentLine === i + 1 && "bg-accent text-accent-foreground font-medium"
+              currentLine === i + 1 &&
+                "bg-accent text-accent-foreground font-medium"
             )}
           >
             {i + 1}
