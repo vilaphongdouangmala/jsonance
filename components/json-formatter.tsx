@@ -204,7 +204,8 @@ export function JsonFormatter() {
                   <SyntaxHighlighter
                     code={formattedJson || jsonInput}
                     language="json"
-                    className="min-h-[400px] p-4 m-0 overflow-auto"
+                    className="min-h-[400px] m-0 overflow-auto text-sm"
+                    lineHeight="1.45rem"
                   />
                 </div>
               </>

@@ -10,9 +10,15 @@ interface SyntaxHighlighterProps {
   code: string;
   language: string;
   className?: string;
+  lineHeight?: string;
 }
 
-export function SyntaxHighlighter({ code, language, className }: SyntaxHighlighterProps) {
+export function SyntaxHighlighter({
+  code,
+  language,
+  className,
+  lineHeight,
+}: SyntaxHighlighterProps) {
   const codeRef = useRef<HTMLElement>(null);
   const { theme } = useTheme();
 
@@ -24,7 +30,11 @@ export function SyntaxHighlighter({ code, language, className }: SyntaxHighlight
 
   return (
     <pre className={cn("bg-transparent", className)}>
-      <code ref={codeRef} className={`language-${language}`}>
+      <code
+        ref={codeRef}
+        className={`language-${language}`}
+        style={{ lineHeight }}
+      >
         {code}
       </code>
     </pre>
