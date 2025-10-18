@@ -67,20 +67,20 @@ export function JsonFormatter() {
             <Button
               variant="outline"
               size="sm"
-              onClick={formatJson}
-              title={t("tooltips.format")}
-            >
-              <Code className="size-4" />
-              <span>{t("actions.format")}</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
               onClick={minifyJson}
               title={t("tooltips.minify")}
             >
               <Minimize2 className="size-4" />
               <span>{t("actions.minify")}</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={formatJson}
+              title={t("tooltips.format")}
+            >
+              <Code className="size-4" />
+              <span>{t("actions.format")}</span>
             </Button>
             <Button
               variant="outline"
