@@ -20,16 +20,26 @@ export function JsonFormatter() {
   const [formattedJson, setFormattedJson] = useState<string>("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
+  const previewLineNumbersRef = useRef<HTMLDivElement>(null);
+  const syntaxHighlighterRef = useRef<HTMLDivElement>(null);
 
   // Update line numbers when input changes and sync scroll
   useEffect(() => {
     const lines = jsonInput.split("\n").length;
     setLineCount(lines);
 
-    // Sync scroll position between textarea and line numbers
-    const syncScroll = () => {
+    // Sync scroll position between textarea and line numbers in edit mode
+    const syncScrollEdit = () => {
       if (lineNumbersRef.current && textareaRef.current) {
         lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
+      }
+    };
+
+    // Sync scroll position between syntax highlighter and line numbers in preview mode
+    const syncScrollPreview = () => {
+      if (previewLineNumbersRef.current && syntaxHighlighterRef.current) {
+        previewLineNumbersRef.current.scrollTop =
+          syntaxHighlighterRef.current.scrollTop;
       }
     };
 
@@ -44,19 +54,34 @@ export function JsonFormatter() {
       }
     };
 
+    // Set up event listeners for edit mode
     const textarea = textareaRef.current;
     if (textarea) {
-      textarea.addEventListener("scroll", syncScroll);
+      textarea.addEventListener("scroll", syncScrollEdit);
       textarea.addEventListener("click", updateCurrentLine);
       textarea.addEventListener("keyup", updateCurrentLine);
+    }
 
-      return () => {
-        textarea.removeEventListener("scroll", syncScroll);
+    // Set up event listeners for preview mode
+    const syntaxHighlighter = syntaxHighlighterRef.current;
+    if (syntaxHighlighter) {
+      syntaxHighlighter.addEventListener("scroll", syncScrollPreview);
+    }
+
+    return () => {
+      // Clean up edit mode listeners
+      if (textarea) {
+        textarea.removeEventListener("scroll", syncScrollEdit);
         textarea.removeEventListener("click", updateCurrentLine);
         textarea.removeEventListener("keyup", updateCurrentLine);
-      };
-    }
-  }, [jsonInput]);
+      }
+
+      // Clean up preview mode listeners
+      if (syntaxHighlighter) {
+        syntaxHighlighter.removeEventListener("scroll", syncScrollPreview);
+      }
+    };
+  }, [jsonInput, isPreviewMode]);
 
   const formatJson = () => {
     try {
@@ -160,17 +185,31 @@ export function JsonFormatter() {
         )}
       </div>
       <div className="relative flex font-mono text-sm border rounded-md overflow-hidden">
-        {/* Preview mode with syntax highlighting */}
         {isPreviewMode ? (
-          <div className="w-full overflow-auto">
+          <div className="w-full flex">
             {(formattedJson || jsonInput).trim() ? (
-              <SyntaxHighlighter
-                code={formattedJson || jsonInput}
-                language="json"
-                className="min-h-[400px] p-4 m-0 overflow-auto"
-              />
+              <>
+                {/* Line numbers in preview mode */}
+                <LineNumbers
+                  ref={previewLineNumbersRef}
+                  lineCount={(formattedJson || jsonInput).split("\n").length}
+                  lineHeight="1.5rem"
+                />
+
+                {/* Syntax highlighted code */}
+                <div
+                  ref={syntaxHighlighterRef}
+                  className="flex-1 overflow-auto"
+                >
+                  <SyntaxHighlighter
+                    code={formattedJson || jsonInput}
+                    language="json"
+                    className="min-h-[400px] p-4 m-0 overflow-auto"
+                  />
+                </div>
+              </>
             ) : (
-              <div className="min-h-[400px] p-4 flex items-center justify-center text-muted-foreground">
+              <div className="w-full min-h-[400px] p-4 flex items-center justify-center text-muted-foreground">
                 {t("placeholders.jsonInput")}
               </div>
             )}
