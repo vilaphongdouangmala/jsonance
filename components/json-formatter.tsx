@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Code, Minimize2, Copy, AlertCircle } from "lucide-react";
+import { Code, Minimize2, Copy, AlertCircle, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function JsonFormatter() {
   const t = useTranslations();
   const [jsonInput, setJsonInput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState<boolean>(false);
 
   const formatJson = () => {
     try {
@@ -51,6 +52,10 @@ export function JsonFormatter() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(jsonInput);
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 1500);
   };
 
   return (
@@ -83,7 +88,11 @@ export function JsonFormatter() {
               onClick={copyToClipboard}
               title={t("tooltips.copy")}
             >
-              <Copy className="size-4" />
+              {copied ? (
+                <Check className="size-4" />
+              ) : (
+                <Copy className="size-4" />
+              )}
             </Button>
           </div>
         </div>
