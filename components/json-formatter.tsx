@@ -135,7 +135,6 @@ export function JsonFormatter() {
     <div className="w-full max-w-3xl flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">{t("app.title")}</h1>
           <div className="flex gap-2">
             <Button
               variant="outline"
