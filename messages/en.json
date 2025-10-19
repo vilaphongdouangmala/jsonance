@@ -13,7 +13,7 @@
     "format": "Format JSON",
     "minify": "Minify JSON",
     "copy": "Copy to clipboard",
-    "preview": "Toggle preview mode",
+    "preview": "Preview",
     "treeView": "Tree view",
     "expandAll": "Expand",
     "collapseAll": "Collapse"

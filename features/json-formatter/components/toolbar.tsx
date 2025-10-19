@@ -52,6 +52,7 @@ export function Toolbar({
             title={t("tooltips.preview")}
           >
             <Eye className="size-4" />
+            <span>{t("tooltips.preview")}</span>
           </Button>
           <Button
             variant="outline"

@@ -6,7 +6,7 @@ export function Header() {
   const t = useTranslations();
   return (
     <header
-      className={cn("flex items-center justify-between w-full max-w-3xl")}
+      className={cn("flex items-center justify-between w-full max-w-4xl")}
     >
       <div className="flex-1">
         <h1 className="text-2xl font-bold">{t("app.title")}</h1>
