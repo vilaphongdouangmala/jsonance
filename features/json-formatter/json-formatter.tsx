@@ -5,9 +5,9 @@ import { AlertCircle } from "lucide-react";
 import { useJsonFormatter } from "@/features/json-formatter/hooks/use-json-formatter";
 import { useClipboard } from "@/features/json-formatter/hooks/use-clipboard";
 import { useLineNumbers } from "@/features/json-formatter/hooks/use-line-numbers";
-import { Toolbar } from "./toolbar";
-import { PreviewSection } from "./preview-section";
-import { EditSection } from "./components/edit-section";
+import { Toolbar } from "@/features/json-formatter/components/toolbar";
+import { PreviewSection } from "@/features/json-formatter/components/preview-section";
+import { EditSection } from "@/features/json-formatter/components/edit-section";
 
 export function JsonFormatter() {
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
