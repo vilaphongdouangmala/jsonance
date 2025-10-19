@@ -32,6 +32,7 @@ export function EditSection({
         lineCount={lineCount}
         currentLine={currentLine}
         lineHeight="1.5rem"
+        className="h-[65vh] min-h-[300px]"
       />
 
       {/* JSON textarea */}
@@ -41,7 +42,7 @@ export function EditSection({
         onChange={(e) => onInputChange(e.target.value)}
         placeholder={t("placeholders.jsonInput")}
         className={cn(
-          "min-h-[400px] font-mono text-sm flex-1",
+          "h-[65vh] min-h-[300px] font-mono text-sm flex-1",
           "resize-none overflow-auto border-0 focus-visible:ring-0 focus-visible:ring-offset-0",
           "rounded-none py-2 whitespace-nowrap"
         )}

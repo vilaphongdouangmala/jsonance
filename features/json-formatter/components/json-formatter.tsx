@@ -58,7 +58,7 @@ export function JsonFormatter() {
   };
 
   return (
-    <div className="w-full max-w-4xl flex flex-col gap-4">
+    <div className="w-full max-w-5xl flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <Toolbar
           isPreviewMode={isPreviewMode}

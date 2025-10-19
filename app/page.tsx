@@ -4,7 +4,7 @@ import { Header } from "@/components/header";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[auto_1fr_auto] items-center justify-items-center min-h-screen p-8 pb-20 gap-8 sm:p-20">
+    <div className="font-sans grid grid-rows-[auto_1fr_auto] items-center justify-items-center min-h-screen p-7 gap-8">
       <Header />
       <main className="flex flex-col gap-[32px] row-start-2 items-center w-full">
         <JsonFormatter />

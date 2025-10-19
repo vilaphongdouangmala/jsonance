@@ -35,7 +35,7 @@ export function PreviewSection({
 
   if (!content.trim()) {
     return (
-      <div className="w-full min-h-[400px] p-4 flex items-center justify-center text-muted-foreground">
+      <div className="w-full h-[65vh] min-h-[300px] p-4 flex items-center justify-center text-muted-foreground">
         {t("placeholders.nothingToPreview")}
       </div>
     );
@@ -45,7 +45,7 @@ export function PreviewSection({
     return (
       <JsonTree
         data={content}
-        className="min-h-[400px] w-full p-4"
+        className="h-[65vh] min-h-[300px] w-full p-4 overflow-auto"
         onCopy={onCopy}
         expandAllTrigger={expandAllTrigger}
         collapseAllTrigger={collapseAllTrigger}
@@ -62,14 +62,18 @@ export function PreviewSection({
         ref={previewLineNumbersRef}
         lineCount={content.split("\n").length}
         lineHeight="1.5rem"
+        className="h-[65vh] min-h-[300px]"
       />
 
       {/* Syntax highlighted code */}
-      <div ref={syntaxHighlighterRef} className="flex-1 overflow-auto">
+      <div
+        ref={syntaxHighlighterRef}
+        className="flex-1 h-[65vh] min-h-[300px] overflow-auto"
+      >
         <SyntaxHighlighter
           code={content}
           language="json"
-          className="min-h-[400px] m-0 overflow-auto text-sm"
+          className="h-full m-0 overflow-auto text-sm"
           lineHeight="1.45rem"
         />
       </div>

@@ -156,6 +156,11 @@ export const JsonTree: React.FC<JsonTreeProps> = ({
     [onDataChange, parsedData]
   );
 
+  // Keyboard navigation for the container
+  const handleContainerKeyDown = useCallback(() => {
+    // Focus management will be handled by individual nodes
+  }, []);
+
   if (!parsedData) {
     return (
       <div className="p-4 text-center text-muted-foreground">
@@ -167,7 +172,8 @@ export const JsonTree: React.FC<JsonTreeProps> = ({
   return (
     <div
       ref={containerRef}
-      className={cn("font-mono text-sm overflow-auto", className)}
+      className={cn("font-mono text-sm", className)}
+      onKeyDown={handleContainerKeyDown}
       role="tree"
       aria-label="JSON Tree View"
     >
