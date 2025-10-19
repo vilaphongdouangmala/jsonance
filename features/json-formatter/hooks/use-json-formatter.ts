@@ -60,9 +60,8 @@ export function useJsonFormatter() {
         } else {
           setFormattedJson("");
         }
-      } catch (err) {
+      } catch {
         // If it's not valid JSON, just use the input as is for preview
-        console.error(err);
         setFormattedJson(value);
       }
       if (error) setError(null);
