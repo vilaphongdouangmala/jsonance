@@ -47,6 +47,16 @@ export function JsonFormatter() {
     setCollapseAllTrigger((prev) => prev + 1);
   };
 
+  const handleDataChange = (newData: any) => {
+    // Convert the updated data back to JSON string and update the input
+    try {
+      const newJsonString = JSON.stringify(newData, null, 2);
+      handleInputChange(newJsonString);
+    } catch (error) {
+      console.error("Error updating JSON data:", error);
+    }
+  };
+
   return (
     <div className="w-full max-w-3xl flex flex-col gap-4">
       <div className="flex flex-col gap-2">
@@ -81,6 +91,8 @@ export function JsonFormatter() {
               onCopy={handleCopy}
               expandAllTrigger={expandAllTrigger}
               collapseAllTrigger={collapseAllTrigger}
+              onDataChange={handleDataChange}
+              isInlineEditEnabled={true}
             />
           </div>
         ) : (

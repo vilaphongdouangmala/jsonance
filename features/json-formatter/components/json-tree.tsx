@@ -20,6 +20,8 @@ interface JsonTreeProps {
   onCopy?: (value: string) => Promise<void> | void;
   expandAllTrigger?: number;
   collapseAllTrigger?: number;
+  onDataChange?: (newData: JsonValue) => void;
+  isInlineEditEnabled?: boolean;
 }
 
 interface TreeState {
@@ -33,6 +35,8 @@ export const JsonTree: React.FC<JsonTreeProps> = ({
   onCopy,
   expandAllTrigger,
   collapseAllTrigger,
+  onDataChange,
+  isInlineEditEnabled = false,
 }) => {
   const [treeState, setTreeState] = useState<TreeState>({
     expandedNodes: new Set([""]),
@@ -118,6 +122,40 @@ export const JsonTree: React.FC<JsonTreeProps> = ({
     }
   }, [collapseAllTrigger]);
 
+  // Handle value changes from inline editing
+  const handleValueChange = useCallback(
+    (path: string[], newValue: JsonValue) => {
+      if (!onDataChange || !parsedData) return;
+
+      // Create a deep copy of the data and update the specific path
+      const updateNestedValue = (
+        obj: any,
+        pathArray: string[],
+        value: JsonValue
+      ): any => {
+        if (pathArray.length === 0) {
+          return value;
+        }
+
+        const [head, ...tail] = pathArray;
+        if (Array.isArray(obj)) {
+          const newArray = [...obj];
+          const index = parseInt(head, 10);
+          newArray[index] = updateNestedValue(obj[index], tail, value);
+          return newArray;
+        } else {
+          const newObj = { ...obj };
+          newObj[head] = updateNestedValue(obj[head], tail, value);
+          return newObj;
+        }
+      };
+
+      const updatedData = updateNestedValue(parsedData, path, newValue);
+      onDataChange(updatedData);
+    },
+    [onDataChange, parsedData]
+  );
+
   if (!parsedData) {
     return (
       <div className="p-4 text-center text-muted-foreground">
@@ -142,6 +180,8 @@ export const JsonTree: React.FC<JsonTreeProps> = ({
         onToggle={handleToggle}
         onFocus={handleFocus}
         onCopy={onCopy}
+        onValueChange={handleValueChange}
+        isInlineEditEnabled={isInlineEditEnabled}
       />
     </div>
   );

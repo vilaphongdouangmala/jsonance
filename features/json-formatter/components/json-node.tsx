@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef } from "react";
-import { ChevronRight, ChevronDown, Copy } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ChevronRight, ChevronDown, Copy, Edit2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { InlineEditor } from "./inline-editor";
 
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
 type JsonObject = { [key: string]: JsonValue };
@@ -18,6 +19,8 @@ interface JsonNodeProps {
   onToggle: (path: string) => void;
   onFocus: (path: string) => void;
   onCopy?: (value: string) => Promise<void> | void;
+  onValueChange?: (path: string[], newValue: JsonValue) => void;
+  isInlineEditEnabled?: boolean;
 }
 
 // Type checking utilities
@@ -103,6 +106,8 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
   onToggle,
   onFocus,
   onCopy,
+  onValueChange,
+  isInlineEditEnabled = false,
 }) => {
   const type = getValueType(data);
   const isExpandable = type === "object" || type === "array";
@@ -111,6 +116,9 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
   const isFocused = focusedNode === pathKey;
   const indentSize = level * 20;
   const nodeRef = useRef<HTMLDivElement>(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const canEdit = isInlineEditEnabled && !isExpandable;
 
   // Auto-scroll to focused node
   useEffect(() => {
@@ -198,16 +206,47 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
     [path, onCopy, pathKey, onFocus]
   );
 
+  const handleEdit = useCallback(() => {
+    if (canEdit) {
+      setIsEditing(true);
+      onFocus(pathKey);
+    }
+  }, [canEdit, pathKey, onFocus]);
+
+  const handleSaveEdit = useCallback(
+    (newValue: JsonValue) => {
+      if (onValueChange) {
+        onValueChange(path, newValue);
+      }
+      setIsEditing(false);
+    },
+    [onValueChange, path]
+  );
+
+  const handleCancelEdit = useCallback(() => {
+    setIsEditing(false);
+  }, []);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      if (isEditing) return; // Don't handle keys when editing
+
       switch (e.key) {
         case "Enter":
         case " ":
           e.preventDefault();
           if (isExpandable) {
             onToggle(pathKey);
+          } else if (canEdit) {
+            handleEdit();
           } else {
             handleKeyboardCopy();
+          }
+          break;
+        case "F2":
+          if (canEdit) {
+            e.preventDefault();
+            handleEdit();
           }
           break;
         case "ArrowRight":
@@ -224,7 +263,16 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
           break;
       }
     },
-    [isExpandable, isExpanded, pathKey, onToggle, handleKeyboardCopy]
+    [
+      isEditing,
+      isExpandable,
+      isExpanded,
+      pathKey,
+      onToggle,
+      handleKeyboardCopy,
+      canEdit,
+      handleEdit,
+    ]
   );
 
   const renderChildren = () => {
@@ -243,6 +291,8 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
           onToggle={onToggle}
           onFocus={onFocus}
           onCopy={onCopy}
+          onValueChange={onValueChange}
+          isInlineEditEnabled={isInlineEditEnabled}
         />
       ));
     }
@@ -259,6 +309,8 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
         onToggle={onToggle}
         onFocus={onFocus}
         onCopy={onCopy}
+        onValueChange={onValueChange}
+        isInlineEditEnabled={isInlineEditEnabled}
       />
     ));
   };
@@ -273,7 +325,8 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
           isFocused && "bg-accent"
         )}
         style={{ paddingLeft: `${indentSize + 8}px` }}
-        onClick={isExpandable ? handleToggle : handleCopyValue}
+        onClick={isExpandable ? handleToggle : undefined}
+        onDoubleClick={canEdit && !isExpandable ? handleEdit : undefined}
         onContextMenu={handleCopyPath}
         onKeyDown={handleKeyDown}
         tabIndex={0}
@@ -307,9 +360,20 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
         )}
 
         {/* Value */}
-        <span className={cn("font-mono text-sm", getTypeColor(type))}>
-          {formatValue(data, type)}
-        </span>
+        {isEditing ? (
+          <div className="flex-1 mr-2">
+            <InlineEditor
+              value={data as string | number | boolean | null}
+              onSave={handleSaveEdit}
+              onCancel={handleCancelEdit}
+              className="w-full"
+            />
+          </div>
+        ) : (
+          <span className={cn("font-mono text-sm", getTypeColor(type))}>
+            {formatValue(data, type)}
+          </span>
+        )}
 
         {/* Type badge for non-expandable items */}
         {!isExpandable && (
@@ -318,14 +382,27 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
           </span>
         )}
 
-        {/* Copy button (visible on hover) */}
-        <button
-          onClick={handleCopyValue}
-          className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-accent rounded"
-          title={`Copy ${type === "string" ? "value" : "JSON"}`}
-        >
-          <Copy className="w-3 h-3" />
-        </button>
+        {/* Action buttons (visible on hover) */}
+        <div className="ml-auto flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {canEdit && !isEditing && (
+            <button
+              onClick={handleEdit}
+              className="p-1 hover:bg-accent rounded"
+              title="Edit value (F2 or double-click)"
+            >
+              <Edit2 className="w-3 h-3" />
+            </button>
+          )}
+          {!isEditing && (
+            <button
+              onClick={handleCopyValue}
+              className="p-1 hover:bg-accent rounded"
+              title={`Copy ${type === "string" ? "value" : "JSON"}`}
+            >
+              <Copy className="w-3 h-3" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Children */}

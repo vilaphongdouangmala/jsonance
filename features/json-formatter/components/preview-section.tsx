@@ -14,6 +14,8 @@ interface PreviewSectionProps {
   onCopy: (value: string) => Promise<void> | void;
   expandAllTrigger?: number;
   collapseAllTrigger?: number;
+  onDataChange?: (newData: any) => void;
+  isInlineEditEnabled?: boolean;
 }
 
 export function PreviewSection({
@@ -25,6 +27,8 @@ export function PreviewSection({
   onCopy,
   expandAllTrigger,
   collapseAllTrigger,
+  onDataChange,
+  isInlineEditEnabled = true,
 }: PreviewSectionProps) {
   const t = useTranslations();
   const content = formattedJson || jsonInput;
@@ -45,6 +49,8 @@ export function PreviewSection({
         onCopy={onCopy}
         expandAllTrigger={expandAllTrigger}
         collapseAllTrigger={collapseAllTrigger}
+        onDataChange={onDataChange}
+        isInlineEditEnabled={isInlineEditEnabled}
       />
     );
   }

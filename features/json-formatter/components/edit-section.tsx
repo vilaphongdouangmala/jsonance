@@ -43,9 +43,14 @@ export function EditSection({
         className={cn(
           "min-h-[400px] font-mono text-sm flex-1",
           "resize-none overflow-auto border-0 focus-visible:ring-0 focus-visible:ring-offset-0",
-          "rounded-none py-2"
+          "rounded-none py-2 whitespace-nowrap"
         )}
-        style={{ lineHeight: "1.5rem" }}
+        style={{
+          lineHeight: "1.5rem",
+          whiteSpace: "pre",
+          overflowWrap: "normal",
+          wordBreak: "normal",
+        }}
       />
     </>
   );
