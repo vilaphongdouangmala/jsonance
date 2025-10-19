@@ -8,6 +8,7 @@ import { useLineNumbers } from "@/features/json-formatter/hooks/use-line-numbers
 import { EditSection } from "@/features/json-formatter/components/edit-section";
 import { PreviewSection } from "@/features/json-formatter/components/preview-section";
 import { Toolbar } from "@/features/json-formatter/components/toolbar";
+import type { JsonValue } from "@/features/json-formatter/types/json";
 
 export function JsonFormatter() {
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
@@ -47,7 +48,7 @@ export function JsonFormatter() {
     setCollapseAllTrigger((prev) => prev + 1);
   };
 
-  const handleDataChange = (newData: any) => {
+  const handleDataChange = (newData: JsonValue) => {
     // Convert the updated data back to JSON string and update the input
     try {
       const newJsonString = JSON.stringify(newData, null, 2);

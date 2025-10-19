@@ -6,6 +6,7 @@ import { LineNumbers } from "@/components/ui/line-numbers";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
+import type { JsonValue } from "@/features/json-formatter/types/json";
 
 interface PreviewSectionProps {
   isTreeView: boolean;
@@ -16,7 +17,7 @@ interface PreviewSectionProps {
   onCopy: (value: string) => Promise<void> | void;
   expandAllTrigger?: number;
   collapseAllTrigger?: number;
-  onDataChange?: (newData: any) => void;
+  onDataChange?: (newData: JsonValue) => void;
   isInlineEditEnabled?: boolean;
 }
 

@@ -9,10 +9,10 @@ import React, {
 } from "react";
 import { cn } from "@/lib/utils";
 import { JsonNode } from "./json-node";
-
-type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-type JsonObject = { [key: string]: JsonValue };
-type JsonArray = JsonValue[];
+import type {
+  JsonValue,
+  JsonObject,
+} from "@/features/json-formatter/types/json";
 
 interface JsonTreeProps {
   data: JsonValue | string;
@@ -129,10 +129,10 @@ export const JsonTree: React.FC<JsonTreeProps> = ({
 
       // Create a deep copy of the data and update the specific path
       const updateNestedValue = (
-        obj: any,
+        obj: JsonValue,
         pathArray: string[],
         value: JsonValue
-      ): any => {
+      ): JsonValue => {
         if (pathArray.length === 0) {
           return value;
         }
@@ -143,10 +143,14 @@ export const JsonTree: React.FC<JsonTreeProps> = ({
           const index = parseInt(head, 10);
           newArray[index] = updateNestedValue(obj[index], tail, value);
           return newArray;
-        } else {
-          const newObj = { ...obj };
-          newObj[head] = updateNestedValue(obj[head], tail, value);
+        } else if (obj && typeof obj === "object") {
+          const objAsRecord = obj as JsonObject;
+          const newObj = { ...objAsRecord };
+          newObj[head] = updateNestedValue(objAsRecord[head], tail, value);
           return newObj;
+        } else {
+          // If obj is a primitive, we can't update nested values
+          return obj;
         }
       };
 

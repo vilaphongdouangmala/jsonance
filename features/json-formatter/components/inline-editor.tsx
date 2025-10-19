@@ -45,7 +45,7 @@ export const InlineEditor: React.FC<InlineEditorProps> = ({
     try {
       // Intelligent type detection based on input
       const trimmed = editValue.trim();
-      
+
       // Handle explicit null
       if (trimmed === "null") {
         parsedValue = null;
@@ -53,12 +53,15 @@ export const InlineEditor: React.FC<InlineEditorProps> = ({
       // Handle explicit booleans
       else if (trimmed === "true") {
         parsedValue = true;
-      }
-      else if (trimmed === "false") {
+      } else if (trimmed === "false") {
         parsedValue = false;
       }
       // Handle quoted strings (user explicitly wants string)
-      else if (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length >= 2) {
+      else if (
+        trimmed.startsWith('"') &&
+        trimmed.endsWith('"') &&
+        trimmed.length >= 2
+      ) {
         parsedValue = trimmed.slice(1, -1); // Remove quotes
       }
       // Handle numbers (including negative and decimals)
@@ -77,7 +80,7 @@ export const InlineEditor: React.FC<InlineEditorProps> = ({
 
       onSave(parsedValue);
       setIsValid(true);
-    } catch (error) {
+    } catch {
       // If anything fails, treat as string
       onSave(editValue.trim());
       setIsValid(true);
@@ -97,7 +100,7 @@ export const InlineEditor: React.FC<InlineEditorProps> = ({
     }
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = () => {
     validateAndSave();
   };
 
@@ -105,10 +108,11 @@ export const InlineEditor: React.FC<InlineEditorProps> = ({
   const detectType = (input: string): string => {
     const trimmed = input.trim();
     if (!trimmed) return "string";
-    
+
     if (trimmed === "null") return "null";
     if (trimmed === "true" || trimmed === "false") return "boolean";
-    if (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length >= 2) return "string";
+    if (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length >= 2)
+      return "string";
     if (/^-?\d+(\.\d+)?$/.test(trimmed)) return "number";
     return "string";
   };
@@ -120,17 +124,22 @@ export const InlineEditor: React.FC<InlineEditorProps> = ({
 
   // Helper function to get placeholder text based on current value type
   const getPlaceholder = (): string => {
-    return "Type: null, true, 5000, \"text\", etc.";
+    return 'Type: null, true, 5000, "text", etc.';
   };
 
   // Get type color based on detected type
   const getTypeColor = (type: string): string => {
     switch (type) {
-      case "string": return "text-green-600";
-      case "number": return "text-blue-600";
-      case "boolean": return "text-purple-600";
-      case "null": return "text-gray-500";
-      default: return "text-muted-foreground";
+      case "string":
+        return "text-green-600";
+      case "number":
+        return "text-blue-600";
+      case "boolean":
+        return "text-purple-600";
+      case "null":
+        return "text-gray-500";
+      default:
+        return "text-muted-foreground";
     }
   };
 
@@ -156,11 +165,13 @@ export const InlineEditor: React.FC<InlineEditorProps> = ({
       />
       {/* Type indicator */}
       {editValue.trim() && (
-        <div className={cn(
-          "absolute right-1 top-1/2 -translate-y-1/2 px-1 py-0.5 text-xs rounded",
-          "bg-muted/50 border text-muted-foreground",
-          getTypeColor(previewType)
-        )}>
+        <div
+          className={cn(
+            "absolute right-1 top-1/2 -translate-y-1/2 px-1 py-0.5 text-xs rounded",
+            "bg-muted/50 border text-muted-foreground",
+            getTypeColor(previewType)
+          )}
+        >
           {previewType}
         </div>
       )}

@@ -4,10 +4,10 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronRight, ChevronDown, Copy, Edit2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InlineEditor } from "./inline-editor";
-
-type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-type JsonObject = { [key: string]: JsonValue };
-type JsonArray = JsonValue[];
+import type {
+  JsonValue,
+  JsonObject,
+} from "@/features/json-formatter/types/json";
 
 interface JsonNodeProps {
   data: JsonValue;
