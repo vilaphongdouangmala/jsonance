@@ -64,13 +64,9 @@ const formatValue = (value: JsonValue, type: string): string => {
     case "number":
       return value?.toString() ?? "0";
     case "array":
-      return `Array(${Array.isArray(value) ? value.length : 0})`;
+      return `[] (${Array.isArray(value) ? value.length : 0})`;
     case "object":
-      return `Object(${
-        value && typeof value === "object" && !Array.isArray(value)
-          ? Object.keys(value).length
-          : 0
-      })`;
+      return `{}`;
     default:
       return String(value ?? "");
   }
