@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { AlertCircle } from "lucide-react";
-import { useJsonFormatter } from "@/hooks/use-json-formatter";
-import { useClipboard } from "@/hooks/use-clipboard";
-import { useLineNumbers } from "@/hooks/use-line-numbers";
+import { useJsonFormatter } from "@/features/json-formatter/hooks/use-json-formatter";
+import { useClipboard } from "@/features/json-formatter/hooks/use-clipboard";
+import { useLineNumbers } from "@/features/json-formatter/hooks/use-line-numbers";
 import { Toolbar } from "./toolbar";
 import { PreviewSection } from "./preview-section";
-import { EditSection } from "./edit-section";
+import { EditSection } from "./components/edit-section";
 
 export function JsonFormatter() {
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);

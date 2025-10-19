@@ -1,4 +1,4 @@
-import { JsonFormatter } from "@/components/features/json-formatter/json-formatter";
+import { JsonFormatter } from "@/features/json-formatter/components/json-formatter";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 
