@@ -11,7 +11,7 @@ interface PreviewSectionProps {
   formattedJson: string;
   previewLineNumbersRef: React.RefObject<HTMLDivElement | null>;
   syntaxHighlighterRef: React.RefObject<HTMLDivElement | null>;
-  onCopy: (value: string) => void;
+  onCopy: (value: string) => Promise<void> | void;
 }
 
 export function PreviewSection({

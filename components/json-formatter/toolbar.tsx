@@ -73,11 +73,7 @@ export function Toolbar({
           onClick={onCopy}
           title={t("tooltips.copy")}
         >
-          {copied ? (
-            <Check className="size-4" />
-          ) : (
-            <Copy className="size-4" />
-          )}
+          {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
           <span>{t("actions.copy")}</span>
         </Button>
       </div>

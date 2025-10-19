@@ -33,8 +33,8 @@ export function JsonFormatter() {
     syntaxHighlighterRef,
   } = useLineNumbers(jsonInput, isPreviewMode);
 
-  const handleCopy = (value?: string) => {
-    copyToClipboard(value || jsonInput);
+  const handleCopy = async (value?: string) => {
+    await copyToClipboard(value || jsonInput);
   };
 
   return (

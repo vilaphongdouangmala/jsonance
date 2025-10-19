@@ -11,7 +11,7 @@ type JsonArray = JsonValue[];
 interface JsonTreeProps {
   data: JsonValue | string;
   className?: string;
-  onCopy?: (value: string) => void;
+  onCopy?: (value: string) => Promise<void> | void;
 }
 
 interface TreeState {
@@ -28,7 +28,7 @@ interface JsonNodeProps {
   focusedNode: string | null;
   onToggle: (path: string) => void;
   onFocus: (path: string) => void;
-  onCopy?: (value: string) => void;
+  onCopy?: (value: string) => Promise<void> | void;
 }
 
 // Type checking utilities
@@ -179,29 +179,35 @@ const JsonNode: React.FC<JsonNodeProps> = ({
   );
 
   const handleCopyValue = useCallback(
-    (e: React.MouseEvent) => {
+    async (e: React.MouseEvent) => {
       e.stopPropagation();
       const value =
         type === "string" ? String(data) : JSON.stringify(data, null, 2);
-      onCopy?.(value);
+      if (onCopy) {
+        await onCopy(value);
+      }
       onFocus(pathKey);
     },
     [data, type, onCopy, pathKey, onFocus]
   );
 
-  const handleKeyboardCopy = useCallback(() => {
+  const handleKeyboardCopy = useCallback(async () => {
     const value =
       type === "string" ? String(data) : JSON.stringify(data, null, 2);
-    onCopy?.(value);
+    if (onCopy) {
+      await onCopy(value);
+    }
     onFocus(pathKey);
   }, [data, type, onCopy, pathKey, onFocus]);
 
   const handleCopyPath = useCallback(
-    (e: React.MouseEvent) => {
+    async (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
       const pathString = path.join(".");
-      onCopy?.(pathString);
+      if (onCopy) {
+        await onCopy(pathString);
+      }
       onFocus(pathKey);
     },
     [path, onCopy, pathKey, onFocus]
