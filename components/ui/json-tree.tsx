@@ -284,7 +284,7 @@ const JsonNode: React.FC<JsonNodeProps> = ({
         ref={nodeRef}
         className={cn(
           "flex items-center py-1 px-2 hover:bg-muted/50 cursor-pointer group",
-          "transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary",
+          "transition-colors duration-150 focus:outline-none",
           isFocused && "bg-accent"
         )}
         style={{ paddingLeft: `${indentSize + 8}px` }}
