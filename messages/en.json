@@ -17,7 +17,8 @@
     "treeView": "Toggle tree view"
   },
   "placeholders": {
-    "jsonInput": "Paste your JSON here..."
+    "jsonInput": "Paste your JSON here...",
+    "nothingToPreview": "Nothing to preview here..."
   },
   "errors": {
     "emptyInput": "Please enter JSON to {action}",

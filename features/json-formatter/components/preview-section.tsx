@@ -28,7 +28,7 @@ export function PreviewSection({
   if (!content.trim()) {
     return (
       <div className="w-full min-h-[400px] p-4 flex items-center justify-center text-muted-foreground">
-        {t("placeholders.jsonInput")}
+        {t("placeholders.nothingToPreview")}
       </div>
     );
   }
