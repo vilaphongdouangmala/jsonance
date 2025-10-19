@@ -12,7 +12,9 @@
   "tooltips": {
     "format": "Format JSON",
     "minify": "Minify JSON",
-    "copy": "Copy to clipboard"
+    "copy": "Copy to clipboard",
+    "preview": "Toggle preview mode",
+    "treeView": "Toggle tree view"
   },
   "placeholders": {
     "jsonInput": "Paste your JSON here..."
