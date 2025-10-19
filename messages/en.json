@@ -16,7 +16,8 @@
     "preview": "Preview",
     "treeView": "Tree view",
     "expandAll": "Expand",
-    "collapseAll": "Collapse"
+    "collapseAll": "Collapse",
+    "scrollToTop": "top"
   },
   "placeholders": {
     "jsonInput": "Paste your JSON here...",

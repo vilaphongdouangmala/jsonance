@@ -1,9 +1,11 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { LineNumbers } from "@/components/ui/line-numbers";
-import { JsonTree } from "@/features/json-formatter/components/json-tree";
+import { JsonTree } from "./json-tree";
 import { SyntaxHighlighter } from "./syntax-highlighter";
+import { LineNumbers } from "@/components/ui/line-numbers";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
+import { useTranslations } from "next-intl";
+import { useRef } from "react";
 
 interface PreviewSectionProps {
   isTreeView: boolean;
@@ -32,6 +34,7 @@ export function PreviewSection({
 }: PreviewSectionProps) {
   const t = useTranslations();
   const content = formattedJson || jsonInput;
+  const treeContainerRef = useRef<HTMLDivElement>(null);
 
   if (!content.trim()) {
     return (
@@ -43,15 +46,23 @@ export function PreviewSection({
 
   if (isTreeView) {
     return (
-      <JsonTree
-        data={content}
-        className="h-[65vh] min-h-[300px] w-full p-4 overflow-auto"
-        onCopy={onCopy}
-        expandAllTrigger={expandAllTrigger}
-        collapseAllTrigger={collapseAllTrigger}
-        onDataChange={onDataChange}
-        isInlineEditEnabled={isInlineEditEnabled}
-      />
+      <>
+        <div
+          ref={treeContainerRef}
+          className="h-[65vh] min-h-[300px] w-full overflow-auto"
+        >
+          <JsonTree
+            data={content}
+            className="w-full p-4"
+            onCopy={onCopy}
+            expandAllTrigger={expandAllTrigger}
+            collapseAllTrigger={collapseAllTrigger}
+            onDataChange={onDataChange}
+            isInlineEditEnabled={isInlineEditEnabled}
+          />
+        </div>
+        <ScrollToTop containerRef={treeContainerRef} />
+      </>
     );
   }
 
@@ -73,10 +84,13 @@ export function PreviewSection({
         <SyntaxHighlighter
           code={content}
           language="json"
-          className="h-full m-0 overflow-auto text-sm"
+          className="h-full m-0 text-sm"
           lineHeight="1.45rem"
         />
       </div>
+
+      {/* Scroll to top button */}
+      <ScrollToTop containerRef={syntaxHighlighterRef} />
     </>
   );
 }

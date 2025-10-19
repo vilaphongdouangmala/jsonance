@@ -2,6 +2,7 @@
 
 import { Textarea } from "@/components/ui/textarea";
 import { LineNumbers } from "@/components/ui/line-numbers";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
@@ -53,6 +54,8 @@ export function EditSection({
           wordBreak: "normal",
         }}
       />
+      {/* Scroll to top button */}
+      <ScrollToTop containerRef={textareaRef} />
     </>
   );
 }
