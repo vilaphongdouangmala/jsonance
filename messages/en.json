@@ -14,7 +14,9 @@
     "minify": "Minify JSON",
     "copy": "Copy to clipboard",
     "preview": "Toggle preview mode",
-    "treeView": "Toggle tree view"
+    "treeView": "Toggle tree view",
+    "expandAll": "Expand all nodes",
+    "collapseAll": "Collapse all nodes"
   },
   "placeholders": {
     "jsonInput": "Paste your JSON here...",

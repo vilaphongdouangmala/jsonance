@@ -12,6 +12,8 @@ import { Toolbar } from "./toolbar";
 export function JsonFormatter() {
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
   const [isTreeView, setIsTreeView] = useState<boolean>(true);
+  const [expandAllTrigger, setExpandAllTrigger] = useState<number>(0);
+  const [collapseAllTrigger, setCollapseAllTrigger] = useState<number>(0);
 
   const {
     jsonInput,
@@ -37,6 +39,14 @@ export function JsonFormatter() {
     await copyToClipboard(value || jsonInput);
   };
 
+  const handleExpandAll = () => {
+    setExpandAllTrigger((prev) => prev + 1);
+  };
+
+  const handleCollapseAll = () => {
+    setCollapseAllTrigger((prev) => prev + 1);
+  };
+
   return (
     <div className="w-full max-w-3xl flex flex-col gap-4">
       <div className="flex flex-col gap-2">
@@ -49,6 +59,8 @@ export function JsonFormatter() {
           onMinify={minifyJson}
           onFormat={formatJson}
           onCopy={() => handleCopy()}
+          onExpandAll={handleExpandAll}
+          onCollapseAll={handleCollapseAll}
         />
         {error && (
           <div className="flex items-center gap-2 text-destructive text-sm p-2 bg-destructive/10 rounded-md">
@@ -67,6 +79,8 @@ export function JsonFormatter() {
               previewLineNumbersRef={previewLineNumbersRef}
               syntaxHighlighterRef={syntaxHighlighterRef}
               onCopy={handleCopy}
+              expandAllTrigger={expandAllTrigger}
+              collapseAllTrigger={collapseAllTrigger}
             />
           </div>
         ) : (

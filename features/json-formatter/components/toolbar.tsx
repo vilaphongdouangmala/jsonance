@@ -1,7 +1,16 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Code, Minimize2, Copy, Check, Eye, TreePine } from "lucide-react";
+import {
+  Code,
+  Minimize2,
+  Copy,
+  Check,
+  Eye,
+  TreePine,
+  Expand,
+  Shrink,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 interface ToolbarProps {
@@ -13,6 +22,8 @@ interface ToolbarProps {
   onMinify: () => void;
   onFormat: () => void;
   onCopy: () => void;
+  onExpandAll?: () => void;
+  onCollapseAll?: () => void;
 }
 
 export function Toolbar({
@@ -24,6 +35,8 @@ export function Toolbar({
   onMinify,
   onFormat,
   onCopy,
+  onExpandAll,
+  onCollapseAll,
 }: ToolbarProps) {
   const t = useTranslations();
 
@@ -77,14 +90,36 @@ export function Toolbar({
         <div className="flex-1"></div>
         <div className="flex gap-1">
           {isPreviewMode && (
-            <Button
-              variant={isTreeView ? "default" : "outline"}
-              size="sm"
-              onClick={onTreeViewToggle}
-              title={t("tooltips.treeView")}
-            >
-              <TreePine className="size-4" />
-            </Button>
+            <>
+              <Button
+                variant={isTreeView ? "default" : "outline"}
+                size="sm"
+                onClick={onTreeViewToggle}
+                title={t("tooltips.treeView")}
+              >
+                <TreePine className="size-4" />
+              </Button>
+              {isTreeView && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onExpandAll}
+                    title={t("tooltips.expandAll")}
+                  >
+                    <Expand className="size-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onCollapseAll}
+                    title={t("tooltips.collapseAll")}
+                  >
+                    <Shrink className="size-4" />
+                  </Button>
+                </>
+              )}
+            </>
           )}
         </div>
       </div>

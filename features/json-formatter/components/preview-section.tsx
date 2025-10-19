@@ -12,6 +12,8 @@ interface PreviewSectionProps {
   previewLineNumbersRef: React.RefObject<HTMLDivElement | null>;
   syntaxHighlighterRef: React.RefObject<HTMLDivElement | null>;
   onCopy: (value: string) => Promise<void> | void;
+  expandAllTrigger?: number;
+  collapseAllTrigger?: number;
 }
 
 export function PreviewSection({
@@ -21,6 +23,8 @@ export function PreviewSection({
   previewLineNumbersRef,
   syntaxHighlighterRef,
   onCopy,
+  expandAllTrigger,
+  collapseAllTrigger,
 }: PreviewSectionProps) {
   const t = useTranslations();
   const content = formattedJson || jsonInput;
@@ -39,6 +43,8 @@ export function PreviewSection({
         data={content}
         className="min-h-[400px] w-full p-4"
         onCopy={onCopy}
+        expandAllTrigger={expandAllTrigger}
+        collapseAllTrigger={collapseAllTrigger}
       />
     );
   }
