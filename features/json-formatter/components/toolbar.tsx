@@ -91,6 +91,28 @@ export function Toolbar({
         <div className="flex gap-1">
           {isPreviewMode && (
             <>
+              {isTreeView && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    title={t("tooltips.collapseAll")}
+                    onClick={onCollapseAll}
+                  >
+                    <Shrink className="size-4" />
+                    <span>{t("tooltips.collapseAll")}</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    title={t("tooltips.expandAll")}
+                    onClick={onExpandAll}
+                  >
+                    <Expand className="size-4" />
+                    <span>{t("tooltips.expandAll")}</span>
+                  </Button>
+                </>
+              )}
               <Button
                 variant={isTreeView ? "default" : "outline"}
                 size="sm"
@@ -98,27 +120,8 @@ export function Toolbar({
                 title={t("tooltips.treeView")}
               >
                 <TreePine className="size-4" />
+                <span>{t("tooltips.treeView")}</span>
               </Button>
-              {isTreeView && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onExpandAll}
-                    title={t("tooltips.expandAll")}
-                  >
-                    <Expand className="size-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onCollapseAll}
-                    title={t("tooltips.collapseAll")}
-                  >
-                    <Shrink className="size-4" />
-                  </Button>
-                </>
-              )}
             </>
           )}
         </div>
