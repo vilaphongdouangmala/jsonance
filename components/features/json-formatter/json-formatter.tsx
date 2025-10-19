@@ -5,13 +5,13 @@ import { AlertCircle } from "lucide-react";
 import { useJsonFormatter } from "@/hooks/use-json-formatter";
 import { useClipboard } from "@/hooks/use-clipboard";
 import { useLineNumbers } from "@/hooks/use-line-numbers";
-import { Toolbar } from "./json-formatter/toolbar";
-import { PreviewSection } from "./json-formatter/preview-section";
-import { EditSection } from "./json-formatter/edit-section";
+import { Toolbar } from "./toolbar";
+import { PreviewSection } from "./preview-section";
+import { EditSection } from "./edit-section";
 
 export function JsonFormatter() {
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
-  const [isTreeView, setIsTreeView] = useState<boolean>(false);
+  const [isTreeView, setIsTreeView] = useState<boolean>(true);
 
   const {
     jsonInput,

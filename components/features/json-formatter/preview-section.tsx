@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { LineNumbers } from "@/components/ui/line-numbers";
-import { SyntaxHighlighter } from "../syntax-highlighter";
+import { SyntaxHighlighter } from "./syntax-highlighter";
 import { JsonTree } from "@/components/ui/json-tree";
 
 interface PreviewSectionProps {
