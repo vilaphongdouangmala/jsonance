@@ -20,28 +20,61 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "jsonance",
-  description: "jsonance",
+  title: {
+    default: "jsonance",
+    template: "%s | jsonance",
+  },
+  description: "Free online JSON formatter, viewer, validator, and beautifier.",
+  authors: [{ name: "Vilaphong Douangmala" }],
+  creator: "Vilaphong Douangmala",
+  publisher: "Vilaphong Douangmala",
+  metadataBase: new URL("https://jsonance.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "jsonance",
+    description:
+      "Free online JSON formatter, viewer, validator, and beautifier.",
+    url: "https://jsonance.vercel.app",
+    siteName: "jsonance",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "jsonance",
+    description:
+      "Free online JSON formatter, viewer, validator, and beautifier.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default async function RootLayout({ children }: Props) {
   return (
-    <>
-      <html lang="en" suppressHydrationWarning>
-        <head />
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <NextIntlClientProvider>{children}</NextIntlClientProvider>
-          </ThemeProvider>
-        </body>
-      </html>
-    </>
+          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

@@ -1,6 +1,28 @@
 import { JsonFormatter } from "@/features/json-formatter/components/json-formatter";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  keywords: [
+    "json formatter",
+    "json validator",
+    "json beautifier",
+    "json minifier",
+    "json parser",
+    "json tool",
+    "json viewer",
+    "json tree viewer",
+    "format json online",
+    "validate json",
+    "minify json",
+    "beautify json",
+    "json syntax checker",
+    "json pretty print",
+    "free json formatter",
+    "online json tools",
+  ],
+};
 
 export default function Home() {
   return (
