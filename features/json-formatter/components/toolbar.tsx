@@ -7,7 +7,6 @@ import {
   Copy,
   Check,
   Eye,
-  TreePine,
   Expand,
   Shrink,
 } from "lucide-react";
@@ -15,10 +14,8 @@ import { useTranslations } from "next-intl";
 
 interface ToolbarProps {
   isPreviewMode: boolean;
-  isTreeView: boolean;
   copied: boolean;
   onPreviewToggle: () => void;
-  onTreeViewToggle: () => void;
   onMinify: () => void;
   onFormat: () => void;
   onCopy: () => void;
@@ -28,10 +25,8 @@ interface ToolbarProps {
 
 export function Toolbar({
   isPreviewMode,
-  isTreeView,
   copied,
   onPreviewToggle,
-  onTreeViewToggle,
   onMinify,
   onFormat,
   onCopy,
@@ -92,36 +87,23 @@ export function Toolbar({
         <div className="flex gap-1">
           {isPreviewMode && (
             <>
-              {isTreeView && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    title={t("tooltips.collapseAll")}
-                    onClick={onCollapseAll}
-                  >
-                    <Shrink className="size-4" />
-                    <span>{t("tooltips.collapseAll")}</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    title={t("tooltips.expandAll")}
-                    onClick={onExpandAll}
-                  >
-                    <Expand className="size-4" />
-                    <span>{t("tooltips.expandAll")}</span>
-                  </Button>
-                </>
-              )}
               <Button
-                variant={isTreeView ? "default" : "outline"}
+                variant="outline"
                 size="sm"
-                onClick={onTreeViewToggle}
-                title={t("tooltips.treeView")}
+                title={t("tooltips.collapseAll")}
+                onClick={onCollapseAll}
               >
-                <TreePine className="size-4" />
-                <span>{t("tooltips.treeView")}</span>
+                <Shrink className="size-4" />
+                <span>{t("tooltips.collapseAll")}</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                title={t("tooltips.expandAll")}
+                onClick={onExpandAll}
+              >
+                <Expand className="size-4" />
+                <span>{t("tooltips.expandAll")}</span>
               </Button>
             </>
           )}

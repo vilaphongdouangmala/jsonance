@@ -11,8 +11,7 @@ import { Toolbar } from "@/features/json-formatter/components/toolbar";
 import type { JsonValue } from "@/features/json-formatter/types/json";
 
 export function JsonFormatter() {
-  const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
-  const [isTreeView, setIsTreeView] = useState<boolean>(true);
+  const [isPreviewMode, setIsPreviewMode] = useState<boolean>(true);
   const [expandAllTrigger, setExpandAllTrigger] = useState<number>(0);
   const [collapseAllTrigger, setCollapseAllTrigger] = useState<number>(0);
 
@@ -27,14 +26,8 @@ export function JsonFormatter() {
 
   const { copied, copyToClipboard } = useClipboard();
 
-  const {
-    lineCount,
-    currentLine,
-    textareaRef,
-    lineNumbersRef,
-    previewLineNumbersRef,
-    syntaxHighlighterRef,
-  } = useLineNumbers(jsonInput, isPreviewMode);
+  const { lineCount, currentLine, textareaRef, lineNumbersRef } =
+    useLineNumbers(jsonInput, isPreviewMode);
 
   const handleCopy = async (value?: string) => {
     await copyToClipboard(value || jsonInput);
@@ -63,10 +56,8 @@ export function JsonFormatter() {
       <div className="flex flex-col gap-2">
         <Toolbar
           isPreviewMode={isPreviewMode}
-          isTreeView={isTreeView}
           copied={copied}
           onPreviewToggle={() => setIsPreviewMode(!isPreviewMode)}
-          onTreeViewToggle={() => setIsTreeView(!isTreeView)}
           onMinify={minifyJson}
           onFormat={formatJson}
           onCopy={() => handleCopy()}
@@ -84,11 +75,8 @@ export function JsonFormatter() {
         {isPreviewMode ? (
           <div className="w-full flex">
             <PreviewSection
-              isTreeView={isTreeView}
               jsonInput={jsonInput}
               formattedJson={formattedJson}
-              previewLineNumbersRef={previewLineNumbersRef}
-              syntaxHighlighterRef={syntaxHighlighterRef}
               onCopy={handleCopy}
               expandAllTrigger={expandAllTrigger}
               collapseAllTrigger={collapseAllTrigger}

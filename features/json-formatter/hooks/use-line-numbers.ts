@@ -7,8 +7,6 @@ export function useLineNumbers(jsonInput: string, isPreviewMode: boolean) {
   const [currentLine, setCurrentLine] = useState<number>(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
-  const previewLineNumbersRef = useRef<HTMLDivElement>(null);
-  const syntaxHighlighterRef = useRef<HTMLDivElement>(null);
 
   // Update line numbers when input changes and sync scroll
   useEffect(() => {
@@ -22,13 +20,6 @@ export function useLineNumbers(jsonInput: string, isPreviewMode: boolean) {
       }
     };
 
-    // Sync scroll position between syntax highlighter and line numbers in preview mode
-    const syncScrollPreview = () => {
-      if (previewLineNumbersRef.current && syntaxHighlighterRef.current) {
-        previewLineNumbersRef.current.scrollTop =
-          syntaxHighlighterRef.current.scrollTop;
-      }
-    };
 
     // Get current cursor position line
     const updateCurrentLine = () => {
@@ -49,11 +40,6 @@ export function useLineNumbers(jsonInput: string, isPreviewMode: boolean) {
       textarea.addEventListener("keyup", updateCurrentLine);
     }
 
-    // Set up event listeners for preview mode
-    const syntaxHighlighter = syntaxHighlighterRef.current;
-    if (syntaxHighlighter) {
-      syntaxHighlighter.addEventListener("scroll", syncScrollPreview);
-    }
 
     return () => {
       // Clean up edit mode listeners
@@ -63,10 +49,6 @@ export function useLineNumbers(jsonInput: string, isPreviewMode: boolean) {
         textarea.removeEventListener("keyup", updateCurrentLine);
       }
 
-      // Clean up preview mode listeners
-      if (syntaxHighlighter) {
-        syntaxHighlighter.removeEventListener("scroll", syncScrollPreview);
-      }
     };
   }, [jsonInput, isPreviewMode]);
 
@@ -75,7 +57,5 @@ export function useLineNumbers(jsonInput: string, isPreviewMode: boolean) {
     currentLine,
     textareaRef,
     lineNumbersRef,
-    previewLineNumbersRef,
-    syntaxHighlighterRef,
   };
 }
