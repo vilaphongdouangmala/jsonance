@@ -8,6 +8,7 @@ import { useLineNumbers } from "@/features/json-formatter/hooks/use-line-numbers
 import { EditSection } from "@/features/json-formatter/components/edit-section";
 import { PreviewSection } from "@/features/json-formatter/components/preview-section";
 import { Toolbar } from "@/features/json-formatter/components/toolbar";
+import { PerformanceMonitor } from "@/features/json-formatter/components/performance-monitor";
 import type { JsonValue } from "@/features/json-formatter/types/json";
 
 export function JsonFormatter() {
@@ -52,49 +53,54 @@ export function JsonFormatter() {
   };
 
   return (
-    <div className="w-full max-w-5xl flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
-        <Toolbar
-          isPreviewMode={isPreviewMode}
-          copied={copied}
-          onPreviewToggle={() => setIsPreviewMode(!isPreviewMode)}
-          onMinify={minifyJson}
-          onFormat={formatJson}
-          onCopy={() => handleCopy()}
-          onExpandAll={handleExpandAll}
-          onCollapseAll={handleCollapseAll}
-        />
-        {error && (
-          <div className="flex items-center gap-2 text-destructive text-sm p-2 bg-destructive/10 rounded-md">
-            <AlertCircle className="size-4" />
-            <span>{error}</span>
-          </div>
-        )}
-      </div>
-      <div className="relative flex font-mono text-sm border rounded-md overflow-hidden">
-        {isPreviewMode ? (
-          <div className="w-full flex">
-            <PreviewSection
-              jsonInput={jsonInput}
-              formattedJson={formattedJson}
-              onCopy={handleCopy}
-              expandAllTrigger={expandAllTrigger}
-              collapseAllTrigger={collapseAllTrigger}
-              onDataChange={handleDataChange}
-              isInlineEditEnabled={true}
-            />
-          </div>
-        ) : (
-          <EditSection
-            jsonInput={jsonInput}
-            lineCount={lineCount}
-            currentLine={currentLine}
-            textareaRef={textareaRef}
-            lineNumbersRef={lineNumbersRef}
-            onInputChange={handleInputChange}
+    <>
+      <div className="w-full max-w-5xl flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <Toolbar
+            isPreviewMode={isPreviewMode}
+            copied={copied}
+            onPreviewToggle={() => setIsPreviewMode(!isPreviewMode)}
+            onMinify={minifyJson}
+            onFormat={formatJson}
+            onCopy={() => handleCopy()}
+            onExpandAll={handleExpandAll}
+            onCollapseAll={handleCollapseAll}
           />
-        )}
+          {error && (
+            <div className="flex items-center gap-2 text-destructive text-sm p-2 bg-destructive/10 rounded-md">
+              <AlertCircle className="size-4" />
+              <span>{error}</span>
+            </div>
+          )}
+        </div>
+        <div className="relative flex font-mono text-sm border rounded-md overflow-hidden">
+          {isPreviewMode ? (
+            <div className="w-full flex">
+              <PreviewSection
+                jsonInput={jsonInput}
+                formattedJson={formattedJson}
+                onCopy={handleCopy}
+                expandAllTrigger={expandAllTrigger}
+                collapseAllTrigger={collapseAllTrigger}
+                onDataChange={handleDataChange}
+                isInlineEditEnabled={true}
+              />
+            </div>
+          ) : (
+            <EditSection
+              jsonInput={jsonInput}
+              lineCount={lineCount}
+              currentLine={currentLine}
+              textareaRef={textareaRef}
+              lineNumbersRef={lineNumbersRef}
+              onInputChange={handleInputChange}
+            />
+          )}
+        </div>
       </div>
-    </div>
+      
+      {/* Performance Monitor - only shows when there are performance issues */}
+      <PerformanceMonitor />
+    </>
   );
 }

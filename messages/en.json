@@ -26,5 +26,26 @@
   "errors": {
     "emptyInput": "Please enter JSON to {action}",
     "invalidJson": "Invalid JSON"
+  },
+  "truncatedString": {
+    "invalidImageData": "Invalid image data ({format}, {size})",
+    "imagePreview": "Image Preview ({format}, {size})",
+    "base64ImageAlt": "Base64 {format} image",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "hide": "Hide",
+    "preview": "Preview"
+  },
+  "stringTypes": {
+    "base64Image": "Base64 Image ({format}, {size})",
+    "base64Data": "Base64 Data ({size})",
+    "url": "URL",
+    "jsonString": "JSON String",
+    "xmlString": "XML String",
+    "longText": "Long Text ({count} chars)",
+    "text": "Text"
+  },
+  "fileSize": {
+    "bytes": "{size} {unit}"
   }
 }

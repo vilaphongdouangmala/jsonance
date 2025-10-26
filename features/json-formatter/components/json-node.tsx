@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronRight, ChevronDown, Copy, Edit2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InlineEditor } from "./inline-editor";
+import { TruncatedString } from "./truncated-string";
 import type {
   JsonValue,
   JsonObject,
@@ -47,8 +48,6 @@ const getTypeColor = (type: string): string => {
 
 const formatValue = (value: JsonValue, type: string): string => {
   switch (type) {
-    case "string":
-      return `"${value}"`;
     case "null":
       return "null";
     case "boolean":
@@ -367,6 +366,14 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
               onSave={handleSaveEdit}
               onCancel={handleCancelEdit}
               className="w-full"
+            />
+          </div>
+        ) : type === "string" ? (
+          <div className="flex-1">
+            <TruncatedString
+              value={String(data)}
+              onCopy={(value) => onCopy?.(value)}
+              showMetadata={true}
             />
           </div>
         ) : (
