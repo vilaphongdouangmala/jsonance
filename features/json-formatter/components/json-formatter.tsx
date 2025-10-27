@@ -12,7 +12,7 @@ import { PerformanceMonitor } from "@/features/json-formatter/components/perform
 import type { JsonValue } from "@/features/json-formatter/types/json";
 
 export function JsonFormatter() {
-  const [isPreviewMode, setIsPreviewMode] = useState<boolean>(true);
+  const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
   const [expandAllTrigger, setExpandAllTrigger] = useState<number>(0);
   const [collapseAllTrigger, setCollapseAllTrigger] = useState<number>(0);
 
@@ -98,7 +98,7 @@ export function JsonFormatter() {
           )}
         </div>
       </div>
-      
+
       {/* Performance Monitor - only shows when there are performance issues */}
       <PerformanceMonitor />
     </>
