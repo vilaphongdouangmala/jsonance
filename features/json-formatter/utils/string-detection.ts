@@ -1,4 +1,11 @@
-export type StringType = 'normal' | 'base64-image' | 'base64-data' | 'url' | 'long-text' | 'json' | 'xml';
+export type StringType =
+  | "normal"
+  | "base64-image"
+  | "base64-data"
+  | "url"
+  | "long-text"
+  | "json"
+  | "xml";
 
 export interface StringAnalysis {
   type: StringType;
@@ -37,7 +44,7 @@ export function analyzeString(str: string): StringAnalysis {
     const [, format, data] = base64ImageMatch;
     const estimatedSize = Math.round((data.length * 3) / 4 / 1024); // KB
     return {
-      type: 'base64-image',
+      type: "base64-image",
       length,
       isLong,
       isVeryLong,
@@ -53,7 +60,7 @@ export function analyzeString(str: string): StringAnalysis {
   if (length > 100 && /^[A-Za-z0-9+/]+=*$/.test(str)) {
     const estimatedSize = Math.round((length * 3) / 4 / 1024); // KB
     return {
-      type: 'base64-data',
+      type: "base64-data",
       length,
       isLong,
       isVeryLong,
@@ -65,9 +72,13 @@ export function analyzeString(str: string): StringAnalysis {
   }
 
   // URL detection
-  if (str.startsWith('http://') || str.startsWith('https://') || str.startsWith('ftp://')) {
+  if (
+    str.startsWith("http://") ||
+    str.startsWith("https://") ||
+    str.startsWith("ftp://")
+  ) {
     return {
-      type: 'url',
+      type: "url",
       length,
       isLong,
       isVeryLong,
@@ -76,11 +87,11 @@ export function analyzeString(str: string): StringAnalysis {
   }
 
   // JSON detection
-  if (str.trim().startsWith('{') || str.trim().startsWith('[')) {
+  if (str.trim().startsWith("{") || str.trim().startsWith("[")) {
     try {
       JSON.parse(str);
       return {
-        type: 'json',
+        type: "json",
         length,
         isLong,
         isVeryLong,
@@ -95,9 +106,9 @@ export function analyzeString(str: string): StringAnalysis {
   }
 
   // XML detection
-  if (str.trim().startsWith('<') && str.trim().endsWith('>')) {
+  if (str.trim().startsWith("<") && str.trim().endsWith(">")) {
     return {
-      type: 'xml',
+      type: "xml",
       length,
       isLong,
       isVeryLong,
@@ -109,7 +120,7 @@ export function analyzeString(str: string): StringAnalysis {
   }
 
   // Long text or normal string
-  const type = isLong ? 'long-text' : 'normal';
+  const type = isLong ? "long-text" : "normal";
   return {
     type,
     length,
@@ -131,46 +142,48 @@ export function getStringTypeDescription(
   if (!t) {
     // Fallback to English if no translation function provided
     switch (analysis.type) {
-      case 'base64-image':
-        return `Base64 Image (${analysis.metadata?.imageFormat?.toUpperCase()}, ${analysis.metadata?.estimatedSize})`;
-      case 'base64-data':
+      case "base64-image":
+        return `Base64 Image (${analysis.metadata?.imageFormat?.toUpperCase()}, ${
+          analysis.metadata?.estimatedSize
+        })`;
+      case "base64-data":
         return `Base64 Data (${analysis.metadata?.estimatedSize})`;
-      case 'url':
-        return 'URL';
-      case 'json':
-        return 'JSON String';
-      case 'xml':
-        return 'XML String';
-      case 'long-text':
+      case "url":
+        return "URL";
+      case "json":
+        return "JSON String";
+      case "xml":
+        return "XML String";
+      case "long-text":
         return `Long Text (${analysis.length.toLocaleString()} chars)`;
       default:
-        return 'Text';
+        return "Text";
     }
   }
 
   // Use translation function
   switch (analysis.type) {
-    case 'base64-image':
-      return t('stringTypes.base64Image', {
+    case "base64-image":
+      return t("stringTypes.base64Image", {
         format: analysis.metadata?.imageFormat?.toUpperCase(),
-        size: analysis.metadata?.estimatedSize
+        size: analysis.metadata?.estimatedSize,
       });
-    case 'base64-data':
-      return t('stringTypes.base64Data', {
-        size: analysis.metadata?.estimatedSize
+    case "base64-data":
+      return t("stringTypes.base64Data", {
+        size: analysis.metadata?.estimatedSize,
       });
-    case 'url':
-      return t('stringTypes.url');
-    case 'json':
-      return t('stringTypes.jsonString');
-    case 'xml':
-      return t('stringTypes.xmlString');
-    case 'long-text':
-      return t('stringTypes.longText', {
-        count: analysis.length.toLocaleString()
+    case "url":
+      return t("stringTypes.url");
+    case "json":
+      return t("stringTypes.jsonString");
+    case "xml":
+      return t("stringTypes.xmlString");
+    case "long-text":
+      return t("stringTypes.longText", {
+        count: analysis.length.toLocaleString(),
       });
     default:
-      return t('stringTypes.text');
+      return t("stringTypes.text");
   }
 }
 
@@ -178,9 +191,9 @@ export function getStringTypeDescription(
  * Format file size in human-readable format
  */
 export function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
