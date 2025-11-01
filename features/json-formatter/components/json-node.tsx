@@ -403,9 +403,9 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
               className="p-0 hover:bg-accent rounded transition-colors"
             >
               {isExpanded ? (
-                <ChevronDown className="w-3 h-3" />
+                <ChevronDown className="w-4 h-4" />
               ) : (
-                <ChevronRight className="w-3 h-3" />
+                <ChevronRight className="w-4 h-4" />
               )}
             </button>
           )}
@@ -476,7 +476,7 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
                     className="p-1 hover:bg-accent rounded"
                     aria-label={t("actions.editValueAria")}
                   >
-                    <Edit2 className="w-3 h-3" />
+                    <Edit2 className="w-4 h-4" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -494,7 +494,7 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
                     className="p-1 hover:bg-accent rounded"
                     aria-label={t("actions.copyKeyAria", { key: keyName })}
                   >
-                    <Key className="w-3 h-3" />
+                    <Key className="w-4 h-4" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -514,7 +514,7 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
                       type: type === "string" ? "value" : "JSON",
                     })}
                   >
-                    <Copy className="w-3 h-3" />
+                    <Copy className="w-4 h-4" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
