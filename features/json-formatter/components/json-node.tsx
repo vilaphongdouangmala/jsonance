@@ -4,6 +4,12 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronRight, ChevronDown, Copy, Edit2, Key } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { InlineEditor } from "./inline-editor";
 import { TruncatedString } from "./truncated-string";
 import type {
@@ -117,6 +123,9 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
   const indentSize = level * 20;
   const nodeRef = useRef<HTMLDivElement>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [copiedKeyName, setCopiedKeyName] = useState(false);
+  const [copiedKeyButton, setCopiedKeyButton] = useState(false);
+  const [copiedValue, setCopiedValue] = useState(false);
   const t = useTranslations();
 
   const canEdit = isInlineEditEnabled && !isExpandable;
@@ -180,6 +189,8 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
         type === "string" ? String(data) : JSON.stringify(data, null, 2);
       if (onCopy) {
         await onCopy(value);
+        setCopiedValue(true);
+        setTimeout(() => setCopiedValue(false), 700);
       }
       onFocus(pathKey);
     },
@@ -191,6 +202,8 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
       type === "string" ? String(data) : JSON.stringify(data, null, 2);
     if (onCopy) {
       await onCopy(value);
+      setCopiedValue(true);
+      setTimeout(() => setCopiedValue(false), 700);
     }
     onFocus(pathKey);
   }, [data, type, onCopy, pathKey, onFocus]);
@@ -213,6 +226,21 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
       e.stopPropagation();
       if (onCopy && hasKey) {
         await onCopy(keyName!);
+        setCopiedKeyName(true);
+        setTimeout(() => setCopiedKeyName(false), 700);
+      }
+      onFocus(pathKey);
+    },
+    [onCopy, keyName, hasKey, pathKey, onFocus]
+  );
+
+  const handleCopyKeyButton = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (onCopy && hasKey) {
+        await onCopy(keyName!);
+        setCopiedKeyButton(true);
+        setTimeout(() => setCopiedKeyButton(false), 700);
       }
       onFocus(pathKey);
     },
@@ -222,6 +250,8 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
   const handleKeyboardCopyKey = useCallback(async () => {
     if (onCopy && hasKey) {
       await onCopy(keyName!);
+      setCopiedKeyButton(true);
+      setTimeout(() => setCopiedKeyButton(false), 700);
     }
     onFocus(pathKey);
   }, [onCopy, keyName, hasKey, pathKey, onFocus]);
@@ -383,22 +413,30 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
 
         {/* Key name */}
         {keyName && (
-          <span
-            className={cn(
-              "text-foreground font-medium mr-1",
-              !isExpandable &&
-                "cursor-pointer hover:bg-accent rounded px-1 -mx-1 transition-colors"
-            )}
-            onClick={!isExpandable ? handleCopyKey : undefined}
-            title={!isExpandable ? t("tooltips.copyKey") : undefined}
-          >
-            &quot;{keyName}&quot;:
-          </span>
+          <TooltipProvider>
+            <Tooltip open={copiedKeyName}>
+              <TooltipTrigger asChild>
+                <span
+                  className={cn(
+                    "text-foreground font-medium mr-1",
+                    !isExpandable &&
+                      "cursor-pointer hover:bg-accent rounded px-1 -mx-1 transition-colors"
+                  )}
+                  onClick={!isExpandable ? handleCopyKey : undefined}
+                >
+                  &quot;{keyName}&quot;:
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t("tooltips.copied")}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
 
         {/* Value */}
         {isEditing ? (
-          <div className="flex-1 mr-2">
+          <div className="flex-1 mx-2">
             <InlineEditor
               value={data as string | number | boolean | null}
               onSave={handleSaveEdit}
@@ -407,7 +445,7 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
             />
           </div>
         ) : type === "string" ? (
-          <div className="flex-1">
+          <div className="flex-1 ml-2">
             <TruncatedString
               value={String(data)}
               onCopy={(value) => onCopy?.(value)}
@@ -415,7 +453,7 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
             />
           </div>
         ) : (
-          <span className={cn("font-mono text-sm", getTypeColor(type))}>
+          <span className={cn("font-mono text-sm ml-2", getTypeColor(type))}>
             {formatValue(data, type)}
           </span>
         )}
@@ -430,36 +468,60 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
         {/* Action buttons (visible on hover) */}
         <div className="ml-auto flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           {canEdit && !isEditing && (
-            <button
-              onClick={handleEdit}
-              className="p-1 hover:bg-accent rounded"
-              title={t("tooltips.edit")}
-              aria-label={t("actions.editValueAria")}
-            >
-              <Edit2 className="w-3 h-3" />
-            </button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={handleEdit}
+                    className="p-1 hover:bg-accent rounded"
+                    aria-label={t("actions.editValueAria")}
+                  >
+                    <Edit2 className="w-3 h-3" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t("tooltips.edit")}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
           {hasKey && !isEditing && (
-            <button
-              onClick={handleCopyKey}
-              className="p-1 hover:bg-accent rounded"
-              title={t("tooltips.copyKey")}
-              aria-label={t("actions.copyKeyAria", { key: keyName })}
-            >
-              <Key className="w-3 h-3" />
-            </button>
+            <TooltipProvider>
+              <Tooltip open={copiedKeyButton}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={handleCopyKeyButton}
+                    className="p-1 hover:bg-accent rounded"
+                    aria-label={t("actions.copyKeyAria", { key: keyName })}
+                  >
+                    <Key className="w-3 h-3" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t("tooltips.copied")}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
           {!isEditing && (
-            <button
-              onClick={handleCopyValue}
-              className="p-1 hover:bg-accent rounded"
-              title={t("tooltips.copyValue")}
-              aria-label={t("actions.copyValueAria", {
-                type: type === "string" ? "value" : "JSON",
-              })}
-            >
-              <Copy className="w-3 h-3" />
-            </button>
+            <TooltipProvider>
+              <Tooltip open={copiedValue}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={handleCopyValue}
+                    className="p-1 hover:bg-accent rounded"
+                    aria-label={t("actions.copyValueAria", {
+                      type: type === "string" ? "value" : "JSON",
+                    })}
+                  >
+                    <Copy className="w-3 h-3" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t("tooltips.copied")}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
       </div>
