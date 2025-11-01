@@ -34,6 +34,29 @@ export function JsonFormatter() {
     await copyToClipboard(value || jsonInput);
   };
 
+  const handleNodeCopy = async (value: string) => {
+    // Copy to clipboard without affecting the toolbar copy state
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(value);
+      } else {
+        // Fallback for older browsers
+        const textArea = document.createElement("textarea");
+        textArea.value = value;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
+    } catch (error) {
+      console.error("Copy failed:", error);
+    }
+  };
+
   const handleExpandAll = () => {
     setExpandAllTrigger((prev) => prev + 1);
   };
@@ -79,7 +102,7 @@ export function JsonFormatter() {
               <PreviewSection
                 jsonInput={jsonInput}
                 formattedJson={formattedJson}
-                onCopy={handleCopy}
+                onCopy={handleNodeCopy}
                 expandAllTrigger={expandAllTrigger}
                 collapseAllTrigger={collapseAllTrigger}
                 onDataChange={handleDataChange}
