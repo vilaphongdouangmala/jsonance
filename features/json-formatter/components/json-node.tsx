@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronRight, ChevronDown, Copy, Edit2 } from "lucide-react";
+import { ChevronRight, ChevronDown, Copy, Edit2, Key } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import { InlineEditor } from "./inline-editor";
 import { TruncatedString } from "./truncated-string";
 import type {
@@ -116,8 +117,10 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
   const indentSize = level * 20;
   const nodeRef = useRef<HTMLDivElement>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const t = useTranslations();
 
   const canEdit = isInlineEditEnabled && !isExpandable;
+  const hasKey = keyName !== undefined;
 
   // Auto-scroll to focused node
   useEffect(() => {
@@ -205,6 +208,24 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
     [path, onCopy, pathKey, onFocus]
   );
 
+  const handleCopyKey = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (onCopy && hasKey) {
+        await onCopy(keyName!);
+      }
+      onFocus(pathKey);
+    },
+    [onCopy, keyName, hasKey, pathKey, onFocus]
+  );
+
+  const handleKeyboardCopyKey = useCallback(async () => {
+    if (onCopy && hasKey) {
+      await onCopy(keyName!);
+    }
+    onFocus(pathKey);
+  }, [onCopy, keyName, hasKey, pathKey, onFocus]);
+
   const handleEdit = useCallback(() => {
     if (canEdit) {
       setIsEditing(true);
@@ -242,6 +263,13 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
             handleKeyboardCopy();
           }
           break;
+        case "k":
+        case "K":
+          if (hasKey) {
+            e.preventDefault();
+            handleKeyboardCopyKey();
+          }
+          break;
         case "F2":
           if (canEdit) {
             e.preventDefault();
@@ -269,8 +297,10 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
       pathKey,
       onToggle,
       handleKeyboardCopy,
+      handleKeyboardCopyKey,
       canEdit,
       handleEdit,
+      hasKey,
     ]
   );
 
@@ -353,7 +383,15 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
 
         {/* Key name */}
         {keyName && (
-          <span className="text-foreground font-medium mr-1">
+          <span
+            className={cn(
+              "text-foreground font-medium mr-1",
+              !isExpandable &&
+                "cursor-pointer hover:bg-accent rounded px-1 -mx-1 transition-colors"
+            )}
+            onClick={!isExpandable ? handleCopyKey : undefined}
+            title={!isExpandable ? t("tooltips.copyKey") : undefined}
+          >
             &quot;{keyName}&quot;:
           </span>
         )}
@@ -395,16 +433,30 @@ export const JsonNode: React.FC<JsonNodeProps> = ({
             <button
               onClick={handleEdit}
               className="p-1 hover:bg-accent rounded"
-              title="Edit value (F2 or double-click)"
+              title={t("tooltips.edit")}
+              aria-label={t("actions.editValueAria")}
             >
               <Edit2 className="w-3 h-3" />
+            </button>
+          )}
+          {hasKey && !isEditing && (
+            <button
+              onClick={handleCopyKey}
+              className="p-1 hover:bg-accent rounded"
+              title={t("tooltips.copyKey")}
+              aria-label={t("actions.copyKeyAria", { key: keyName })}
+            >
+              <Key className="w-3 h-3" />
             </button>
           )}
           {!isEditing && (
             <button
               onClick={handleCopyValue}
               className="p-1 hover:bg-accent rounded"
-              title={`Copy ${type === "string" ? "value" : "JSON"}`}
+              title={t("tooltips.copyValue")}
+              aria-label={t("actions.copyValueAria", {
+                type: type === "string" ? "value" : "JSON",
+              })}
             >
               <Copy className="w-3 h-3" />
             </button>
