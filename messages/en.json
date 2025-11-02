@@ -45,8 +45,8 @@
     "preview": "Preview"
   },
   "stringTypes": {
-    "base64Image": "Base64 Image ({format}, {size})",
-    "base64Data": "Base64 Data ({size})",
+    "base64Image": "Base64 Image ({format})",
+    "base64Data": "Base64 Data",
     "url": "URL",
     "jsonString": "JSON String",
     "xmlString": "XML String",

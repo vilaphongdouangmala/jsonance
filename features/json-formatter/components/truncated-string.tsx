@@ -15,7 +15,6 @@ import {
   analyzeString,
   getStringTypeDescription,
   STRING_THRESHOLDS,
-  type StringAnalysis,
 } from "../utils/string-detection";
 
 interface TruncatedStringProps {
@@ -38,7 +37,6 @@ const Base64ImagePreview: React.FC<Base64ImagePreviewProps> = ({
   size,
 }) => {
   const [imageError, setImageError] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const t = useTranslations();
 
   if (imageError) {
@@ -52,21 +50,8 @@ const Base64ImagePreview: React.FC<Base64ImagePreviewProps> = ({
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          {isExpanded ? (
-            <ChevronDown className="w-3 h-3" />
-          ) : (
-            <ChevronRight className="w-3 h-3" />
-          )}
-          <Image className="w-4 h-4" />
-          <span>{t("truncatedString.imagePreview", { format, size })}</span>
-        </button>
-      </div>
-      {isExpanded && (
+      <div className="flex items-center gap-2"></div>
+      {
         <div className="p-2 bg-muted rounded">
           <img
             src={src}
@@ -76,7 +61,7 @@ const Base64ImagePreview: React.FC<Base64ImagePreviewProps> = ({
             loading="lazy"
           />
         </div>
-      )}
+      }
     </div>
   );
 };
@@ -99,7 +84,6 @@ export const TruncatedString: React.FC<TruncatedStringProps> = ({
   value,
   maxLength = STRING_THRESHOLDS.SHORT,
   className,
-  onCopy,
   showMetadata = true,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -181,8 +165,8 @@ export const TruncatedString: React.FC<TruncatedStringProps> = ({
 
   return (
     <div className={cn("space-y-1", className)}>
-      {renderStringContent()}
       {renderMetadata()}
+      {renderStringContent()}
 
       {/* Base64 Image Preview */}
       {analysis.type === "base64-image" && showPreview && analysis.metadata && (

@@ -143,11 +143,10 @@ export function getStringTypeDescription(
     // Fallback to English if no translation function provided
     switch (analysis.type) {
       case "base64-image":
-        return `Base64 Image (${analysis.metadata?.imageFormat?.toUpperCase()}, ${
-          analysis.metadata?.estimatedSize
+        return `Base64 Image (${analysis.metadata?.imageFormat?.toUpperCase()}
         })`;
       case "base64-data":
-        return `Base64 Data (${analysis.metadata?.estimatedSize})`;
+        return `Base64 Data`;
       case "url":
         return "URL";
       case "json":
@@ -166,12 +165,9 @@ export function getStringTypeDescription(
     case "base64-image":
       return t("stringTypes.base64Image", {
         format: analysis.metadata?.imageFormat?.toUpperCase(),
-        size: analysis.metadata?.estimatedSize,
       });
     case "base64-data":
-      return t("stringTypes.base64Data", {
-        size: analysis.metadata?.estimatedSize,
-      });
+      return t("stringTypes.base64Data");
     case "url":
       return t("stringTypes.url");
     case "json":
