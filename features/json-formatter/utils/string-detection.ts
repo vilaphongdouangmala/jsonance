@@ -137,7 +137,7 @@ export function analyzeString(str: string): StringAnalysis {
  */
 export function getStringTypeDescription(
   analysis: StringAnalysis,
-  t?: (key: string, params?: any) => string
+  t?: (key: string, params?: Record<string, unknown>) => string
 ): string {
   if (!t) {
     // Fallback to English if no translation function provided

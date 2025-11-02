@@ -4,7 +4,7 @@ import React, { useState, useCallback, useMemo } from "react";
 import {
   ChevronRight,
   ChevronDown,
-  Image,
+  Image as ImageIcon,
   FileText,
   Link,
   Code,
@@ -16,6 +16,7 @@ import {
   getStringTypeDescription,
   STRING_THRESHOLDS,
 } from "../utils/string-detection";
+import Image from "next/image";
 
 interface TruncatedStringProps {
   value: string;
@@ -42,7 +43,7 @@ const Base64ImagePreview: React.FC<Base64ImagePreviewProps> = ({
   if (imageError) {
     return (
       <div className="flex items-center gap-2 p-2 bg-muted rounded text-sm text-muted-foreground">
-        <Image className="w-4 h-4" />
+        <ImageIcon className="w-4 h-4" />
         <span>{t("truncatedString.invalidImageData", { format, size })}</span>
       </div>
     );
@@ -53,7 +54,7 @@ const Base64ImagePreview: React.FC<Base64ImagePreviewProps> = ({
       <div className="flex items-center gap-2"></div>
       {
         <div className="p-2 bg-muted rounded">
-          <img
+          <Image
             src={src}
             alt={t("truncatedString.base64ImageAlt", { format })}
             className="max-w-full max-h-48 object-contain rounded border"
@@ -69,7 +70,7 @@ const Base64ImagePreview: React.FC<Base64ImagePreviewProps> = ({
 const getTypeIcon = (type: string) => {
   switch (type) {
     case "base64-image":
-      return <Image className="w-3 h-3" />;
+      return <ImageIcon className="w-3 h-3" />;
     case "url":
       return <Link className="w-3 h-3" />;
     case "json":
@@ -113,7 +114,7 @@ export const TruncatedString: React.FC<TruncatedStringProps> = ({
 
   const renderStringContent = () => {
     return (
-      <span className="font-mono text-sm break-all">"{displayValue}"</span>
+      <span className="font-mono text-sm break-all">&quot;{displayValue}&quot;</span>
     );
   };
 
@@ -151,7 +152,7 @@ export const TruncatedString: React.FC<TruncatedStringProps> = ({
             onClick={handleTogglePreview}
             className="flex items-center gap-1 px-2 py-1 bg-muted hover:bg-muted/80 rounded text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            <Image className="w-3 h-3" />
+            <ImageIcon className="w-3 h-3" />
             <span>
               {showPreview
                 ? t("truncatedString.hide")
