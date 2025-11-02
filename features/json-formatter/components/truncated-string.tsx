@@ -57,6 +57,8 @@ const Base64ImagePreview: React.FC<Base64ImagePreviewProps> = ({
           <Image
             src={src}
             alt={t("truncatedString.base64ImageAlt", { format })}
+            width={640}
+            height={640}
             className="max-w-full max-h-48 object-contain rounded border"
             onError={() => setImageError(true)}
             loading="lazy"
@@ -114,7 +116,9 @@ export const TruncatedString: React.FC<TruncatedStringProps> = ({
 
   const renderStringContent = () => {
     return (
-      <span className="font-mono text-sm break-all">&quot;{displayValue}&quot;</span>
+      <span className="font-mono text-sm break-all">
+        &quot;{displayValue}&quot;
+      </span>
     );
   };
 

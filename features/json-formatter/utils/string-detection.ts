@@ -137,7 +137,7 @@ export function analyzeString(str: string): StringAnalysis {
  */
 export function getStringTypeDescription(
   analysis: StringAnalysis,
-  t?: (key: string, params?: Record<string, unknown>) => string
+  t?: (key: string, params?: Record<string, string | number | Date>) => string
 ): string {
   if (!t) {
     // Fallback to English if no translation function provided
@@ -164,7 +164,7 @@ export function getStringTypeDescription(
   switch (analysis.type) {
     case "base64-image":
       return t("stringTypes.base64Image", {
-        format: analysis.metadata?.imageFormat?.toUpperCase(),
+        format: analysis.metadata?.imageFormat?.toUpperCase() || "UNKNOWN",
       });
     case "base64-data":
       return t("stringTypes.base64Data");
@@ -176,7 +176,7 @@ export function getStringTypeDescription(
       return t("stringTypes.xmlString");
     case "long-text":
       return t("stringTypes.longText", {
-        count: analysis.length.toLocaleString(),
+        count: analysis.length,
       });
     default:
       return t("stringTypes.text");
