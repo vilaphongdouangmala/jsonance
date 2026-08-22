@@ -4,7 +4,6 @@ import { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { useJsonFormatter } from "@/features/json-formatter/hooks/use-json-formatter";
 import { useClipboard } from "@/features/json-formatter/hooks/use-clipboard";
-import { useLineNumbers } from "@/features/json-formatter/hooks/use-line-numbers";
 import { EditSection } from "@/features/json-formatter/components/edit-section";
 import { PreviewSection } from "@/features/json-formatter/components/preview-section";
 import { Toolbar } from "@/features/json-formatter/components/toolbar";
@@ -16,19 +15,10 @@ export function JsonFormatter() {
   const [expandAllTrigger, setExpandAllTrigger] = useState<number>(0);
   const [collapseAllTrigger, setCollapseAllTrigger] = useState<number>(0);
 
-  const {
-    jsonInput,
-    error,
-    formattedJson,
-    formatJson,
-    minifyJson,
-    handleInputChange,
-  } = useJsonFormatter();
+  const { jsonInput, error, formatJson, minifyJson, handleInputChange } =
+    useJsonFormatter();
 
   const { copied, copyToClipboard } = useClipboard();
-
-  const { lineCount, currentLine, textareaRef, lineNumbersRef } =
-    useLineNumbers(jsonInput, isPreviewMode);
 
   const handleCopy = async (value?: string) => {
     await copyToClipboard(value || jsonInput);
@@ -101,7 +91,6 @@ export function JsonFormatter() {
             <div className="w-full flex">
               <PreviewSection
                 jsonInput={jsonInput}
-                formattedJson={formattedJson}
                 onCopy={handleNodeCopy}
                 expandAllTrigger={expandAllTrigger}
                 collapseAllTrigger={collapseAllTrigger}
@@ -112,10 +101,6 @@ export function JsonFormatter() {
           ) : (
             <EditSection
               jsonInput={jsonInput}
-              lineCount={lineCount}
-              currentLine={currentLine}
-              textareaRef={textareaRef}
-              lineNumbersRef={lineNumbersRef}
               onInputChange={handleInputChange}
             />
           )}
