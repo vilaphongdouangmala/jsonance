@@ -14,6 +14,10 @@ import {
   syntaxHighlighting,
   HighlightStyle,
   bracketMatching,
+  foldGutter,
+  foldKeymap,
+  foldAll,
+  unfoldAll,
 } from "@codemirror/language";
 import { history, defaultKeymap, historyKeymap } from "@codemirror/commands";
 import { json } from "@codemirror/lang-json";
@@ -27,6 +31,14 @@ interface CodeEditorProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  /**
+   * Bumped by the toolbar's "Collapse All" to fold every container. Watched by
+   * an effect below (same counter-trigger idiom the tree uses for expand/collapse
+   * all). Folds are ephemeral, so a stale trigger has no bad effect.
+   */
+  foldAllTrigger?: number;
+  /** Bumped by the toolbar's "Expand All" to unfold every container. */
+  unfoldAllTrigger?: number;
 }
 
 // JSON token colors, one palette per theme. These mirror the tree's Tailwind
@@ -184,6 +196,8 @@ export function CodeEditor({
   onChange,
   placeholder,
   className,
+  foldAllTrigger,
+  unfoldAllTrigger,
 }: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -202,13 +216,14 @@ export function CodeEditor({
       extensions: [
         baseTheme,
         lineNumbers(),
+        foldGutter(),
         lintGutter(),
         highlightActiveLine(),
         highlightActiveLineGutter(),
         drawSelection(),
         history(),
         bracketMatching(),
-        keymap.of([...defaultKeymap, ...historyKeymap]),
+        keymap.of([...defaultKeymap, ...historyKeymap, ...foldKeymap]),
         json(),
         jsonLinter,
         EditorView.lineWrapping,
@@ -256,6 +271,20 @@ export function CodeEditor({
       ),
     });
   }, [resolvedTheme]);
+
+  // Fold-all / unfold-all, driven by the toolbar via counter triggers. The
+  // initial 0 is ignored (same guard the tree uses) so mounting doesn't fold.
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view || !foldAllTrigger) return;
+    foldAll(view);
+  }, [foldAllTrigger]);
+
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view || !unfoldAllTrigger) return;
+    unfoldAll(view);
+  }, [unfoldAllTrigger]);
 
   return (
     <div

@@ -6,9 +6,16 @@ import { useTranslations } from "next-intl";
 interface EditSectionProps {
   jsonInput: string;
   onInputChange: (value: string) => void;
+  foldAllTrigger?: number;
+  unfoldAllTrigger?: number;
 }
 
-export function EditSection({ jsonInput, onInputChange }: EditSectionProps) {
+export function EditSection({
+  jsonInput,
+  onInputChange,
+  foldAllTrigger,
+  unfoldAllTrigger,
+}: EditSectionProps) {
   const t = useTranslations();
 
   return (
@@ -17,6 +24,8 @@ export function EditSection({ jsonInput, onInputChange }: EditSectionProps) {
         value={jsonInput}
         onChange={onInputChange}
         placeholder={t("placeholders.jsonInput")}
+        foldAllTrigger={foldAllTrigger}
+        unfoldAllTrigger={unfoldAllTrigger}
       />
     </div>
   );
