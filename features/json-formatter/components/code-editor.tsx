@@ -70,6 +70,18 @@ const baseTheme = EditorView.theme({
     fontFamily: "var(--font-mono, ui-monospace, monospace)",
   },
   ".cm-content": { fontFamily: "inherit" },
+  // Fold-gutter arrows: the default glyphs render small and sit high against
+  // the line-number text. Match the line height so they centre on the row,
+  // and bump the size so the ▸/▾ is legible.
+  ".cm-foldGutter .cm-gutterElement": {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "0.9rem",
+    lineHeight: "1",
+    padding: "0 2px",
+    cursor: "pointer",
+  },
 });
 
 const lightTheme = EditorView.theme(
