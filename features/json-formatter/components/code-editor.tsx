@@ -29,16 +29,24 @@ interface CodeEditorProps {
   className?: string;
 }
 
-// JSON token colors, tuned to match the tree's palette (green strings, blue
-// numbers, purple booleans/null). One style works for both themes because the
-// hues stay legible on either background; the editor background/foreground come
-// from the theme extension below.
-const highlightStyle = HighlightStyle.define([
-  { tag: t.string, color: "#16a34a" },
-  { tag: [t.number, t.integer], color: "#2563eb" },
-  { tag: [t.bool, t.null, t.keyword], color: "#9333ea" },
-  { tag: [t.propertyName, t.definition(t.propertyName)], color: "#0f766e" },
-  { tag: [t.punctuation, t.separator, t.bracket], color: "#64748b" },
+// JSON token colors, one palette per theme. These mirror the tree's Tailwind
+// `dark:` variants in json-row.tsx so the editor and the tree read the same:
+// green strings, blue numbers, purple booleans/null, teal keys, slate
+// punctuation — each step tuned for contrast on its background.
+const lightHighlightStyle = HighlightStyle.define([
+  { tag: t.string, color: "#16a34a" }, // green-600
+  { tag: [t.number, t.integer], color: "#2563eb" }, // blue-600
+  { tag: [t.bool, t.null, t.keyword], color: "#9333ea" }, // purple-600
+  { tag: [t.propertyName, t.definition(t.propertyName)], color: "#0f766e" }, // teal-700
+  { tag: [t.punctuation, t.separator, t.bracket], color: "#64748b" }, // slate-500
+]);
+
+const darkHighlightStyle = HighlightStyle.define([
+  { tag: t.string, color: "#4ade80" }, // green-400
+  { tag: [t.number, t.integer], color: "#60a5fa" }, // blue-400
+  { tag: [t.bool, t.null, t.keyword], color: "#c084fc" }, // purple-400
+  { tag: [t.propertyName, t.definition(t.propertyName)], color: "#5eead4" }, // teal-300
+  { tag: [t.punctuation, t.separator, t.bracket], color: "#94a3b8" }, // slate-400
 ]);
 
 // Layout rules that don't depend on light/dark. Kept separate so the theme
@@ -83,6 +91,14 @@ const darkTheme = EditorView.theme(
   },
   { dark: true }
 );
+
+// The theme and its matching token colors travel together in one compartment,
+// so a theme switch swaps both the chrome and the syntax highlighting at once.
+function themeExtension(dark: boolean) {
+  return dark
+    ? [darkTheme, syntaxHighlighting(darkHighlightStyle)]
+    : [lightTheme, syntaxHighlighting(lightHighlightStyle)];
+}
 
 // The whole document, as a last resort. Preferred only when we truly have no
 // idea where the error is — better than nothing, worse than any narrower guess.
@@ -195,11 +211,8 @@ export function CodeEditor({
         keymap.of([...defaultKeymap, ...historyKeymap]),
         json(),
         jsonLinter,
-        syntaxHighlighting(highlightStyle),
         EditorView.lineWrapping,
-        themeCompartment.current.of(
-          resolvedTheme === "dark" ? darkTheme : lightTheme
-        ),
+        themeCompartment.current.of(themeExtension(resolvedTheme === "dark")),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             onChangeRef.current(update.state.doc.toString());
@@ -233,13 +246,13 @@ export function CodeEditor({
     }
   }, [value]);
 
-  // Swap the theme via compartment (no view recreation).
+  // Swap the theme (chrome + token colors) via compartment, no view recreation.
   useEffect(() => {
     const view = viewRef.current;
     if (!view) return;
     view.dispatch({
       effects: themeCompartment.current.reconfigure(
-        resolvedTheme === "dark" ? darkTheme : lightTheme
+        themeExtension(resolvedTheme === "dark")
       ),
     });
   }, [resolvedTheme]);
