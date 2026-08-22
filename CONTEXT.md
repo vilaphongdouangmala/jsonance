@@ -11,9 +11,11 @@ These are mutually exclusive views of the same document, toggled from the toolba
 
 ## Editor
 
-- **Editor** — the code-editing component behind Edit mode (CodeMirror 6). Provides syntax highlighting, an inline parse-error marker, and a native, virtualized line-number gutter.
+- **Editor** — the code-editing component behind Edit mode (CodeMirror 6). Provides syntax highlighting, an inline parse-error marker, a native virtualized line-number gutter, and code *folding*.
 - **Editor gutter** — the line-number column that is part of the editor and scrolls natively with the text. It cannot drift from the text (single scroll container), unlike the previous two-element scroll-synced gutter.
 - **Inline error marker** — the in-editor indication of a JSON parse error at the offending line, computed on a debounced parse (not per keystroke).
+- **Fold** — the Edit-mode act of hiding a container's lines behind its opening line, leaving an `…` placeholder. This is the editor's analog of the tree's *collapse*, but a distinct mechanism: it operates on the raw text (CodeMirror fold ranges) rather than on tree rows, and its state is ephemeral — folds survive typing but reset on any whole-document replace (Format, Minify, or an edit that round-trips through Preview mode). "Fold"/"unfold" is the editor; "collapse"/"expand" is the tree.
+- **Fold gutter** — the column of clickable ▸/▾ arrows beside the *editor gutter* that folds/unfolds the container starting on that line. Distinct from the *tree gutter* (which shows canonical line numbers, not fold controls).
 
 ## Tree
 
