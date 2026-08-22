@@ -42,7 +42,7 @@ const lightHighlightStyle = HighlightStyle.define([
 ]);
 
 const darkHighlightStyle = HighlightStyle.define([
-  { tag: t.string, color: "#4ade80" }, // green-400
+  { tag: t.string, color: "#22c55e" }, // green-500
   { tag: [t.number, t.integer], color: "#60a5fa" }, // blue-400
   { tag: [t.bool, t.null, t.keyword], color: "#c084fc" }, // purple-400
   { tag: [t.propertyName, t.definition(t.propertyName)], color: "oklch(96.8% 0.007 247.896)" }, // slate-100
