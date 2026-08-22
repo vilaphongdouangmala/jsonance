@@ -84,8 +84,27 @@ const darkTheme = EditorView.theme(
   { dark: true }
 );
 
+// The whole document, as a last resort. Preferred only when we truly have no
+// idea where the error is — better than nothing, worse than any narrower guess.
+function wholeLastLine(doc: EditorState["doc"]): { from: number; to: number } {
+  // Errors with no position are almost always truncation / a stray token near
+  // the end, so mark the last non-blank line rather than painting the whole doc.
+  for (let n = doc.lines; n >= 1; n--) {
+    const line = doc.line(n);
+    if (line.text.trim() !== "") return { from: line.from, to: line.to };
+  }
+  return { from: 0, to: doc.length };
+}
+
 // Extract a { line, column } from a V8 JSON.parse SyntaxError message.
-// Modern V8: "... at position N (line L column C)". Older: "... at position N".
+// V8 comes in three shapes, only the first two of which carry a location:
+//   1. "... at position N (line L column C)"  — modern, has line/column
+//   2. "... at position N"                    — older, has an offset
+//   3. "Unexpected token 'X', \"<snippet>\" is not valid JSON" and
+//      "Unexpected end of JSON input"          — NO location at all
+// For shape 3 we recover a narrow range instead of underlining the whole file
+// (which is what a naive fallback does, and which is worst on exactly the most
+// common mistakes: trailing comma, missing value, truncated input).
 function errorRange(
   message: string,
   doc: EditorState["doc"]
@@ -104,7 +123,27 @@ function errorRange(
     const line = doc.lineAt(pos);
     return { from: pos, to: line.to };
   }
-  return { from: 0, to: doc.length };
+
+  // Shape 3a: a snippet is quoted. V8 truncates it from the left with "..." and
+  // ends it at the offending token, so the snippet's *tail* sits at (or very
+  // near) the error. Locate that tail in the document.
+  const snippetMatch = message.match(/"([\s\S]*)" is not valid JSON/);
+  if (snippetMatch) {
+    const text = doc.toString();
+    let snippet = snippetMatch[1];
+    if (snippet.startsWith("...")) snippet = snippet.slice(3);
+    // The tail is the reliable part; match on the last chunk of it.
+    const tail = snippet.slice(-40);
+    const idx = tail ? text.lastIndexOf(tail) : -1;
+    if (idx !== -1) {
+      const end = Math.min(idx + tail.length, doc.length);
+      const line = doc.lineAt(end);
+      return { from: line.from, to: line.to };
+    }
+  }
+
+  // Shape 3b (e.g. "Unexpected end of JSON input") or an unlocatable snippet.
+  return wholeLastLine(doc);
 }
 
 const jsonLinter = linter(
