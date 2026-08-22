@@ -85,28 +85,26 @@ export function Toolbar({
       <div className="flex items-center justify-between">
         <div className="flex-1"></div>
         <div className="flex gap-1">
-          {isPreviewMode && (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                title={t("tooltips.collapseAll")}
-                onClick={onCollapseAll}
-              >
-                <Shrink className="size-4" />
-                <span>{t("tooltips.collapseAll")}</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                title={t("tooltips.expandAll")}
-                onClick={onExpandAll}
-              >
-                <Expand className="size-4" />
-                <span>{t("tooltips.expandAll")}</span>
-              </Button>
-            </>
-          )}
+          {/* Collapse/Expand All applies to the tree in Preview mode and to
+              editor folding in Edit mode (handlers branch on the mode). */}
+          <Button
+            variant="outline"
+            size="sm"
+            title={t("tooltips.collapseAll")}
+            onClick={onCollapseAll}
+          >
+            <Shrink className="size-4" />
+            <span>{t("tooltips.collapseAll")}</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            title={t("tooltips.expandAll")}
+            onClick={onExpandAll}
+          >
+            <Expand className="size-4" />
+            <span>{t("tooltips.expandAll")}</span>
+          </Button>
         </div>
       </div>
     </div>

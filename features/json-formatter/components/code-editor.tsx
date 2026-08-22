@@ -14,6 +14,10 @@ import {
   syntaxHighlighting,
   HighlightStyle,
   bracketMatching,
+  foldGutter,
+  foldKeymap,
+  foldAll,
+  unfoldAll,
 } from "@codemirror/language";
 import { history, defaultKeymap, historyKeymap } from "@codemirror/commands";
 import { json } from "@codemirror/lang-json";
@@ -27,6 +31,14 @@ interface CodeEditorProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  /**
+   * Bumped by the toolbar's "Collapse All" to fold every container. Watched by
+   * an effect below (same counter-trigger idiom the tree uses for expand/collapse
+   * all). Folds are ephemeral, so a stale trigger has no bad effect.
+   */
+  foldAllTrigger?: number;
+  /** Bumped by the toolbar's "Expand All" to unfold every container. */
+  unfoldAllTrigger?: number;
 }
 
 // JSON token colors, one palette per theme. These mirror the tree's Tailwind
@@ -58,6 +70,25 @@ const baseTheme = EditorView.theme({
     fontFamily: "var(--font-mono, ui-monospace, monospace)",
   },
   ".cm-content": { fontFamily: "inherit" },
+  // Fold-gutter arrows: the default glyphs render small and sit high against
+  // the line-number text. Match the line height so they centre on the row,
+  // and bump the size so the ▸/▾ is legible.
+  // Keep the fold element's box flush with the row (matching the line-number
+  // gutter) so their active-line backgrounds stay aligned. Size/position the
+  // glyph via its inner span so the element box is untouched.
+  ".cm-foldGutter .cm-gutterElement": {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+  },
+  ".cm-foldGutter .cm-gutterElement > span": {
+    fontSize: "1.15rem",
+    lineHeight: "1",
+    // The ▸/▾ glyph's visual weight sits below its box centre; nudge just the
+    // glyph up to line up with the line-number digits (no layout shift).
+    transform: "translateY(-2px)",
+  },
 });
 
 const lightTheme = EditorView.theme(
@@ -184,6 +215,8 @@ export function CodeEditor({
   onChange,
   placeholder,
   className,
+  foldAllTrigger,
+  unfoldAllTrigger,
 }: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -202,13 +235,14 @@ export function CodeEditor({
       extensions: [
         baseTheme,
         lineNumbers(),
+        foldGutter(),
         lintGutter(),
         highlightActiveLine(),
         highlightActiveLineGutter(),
         drawSelection(),
         history(),
         bracketMatching(),
-        keymap.of([...defaultKeymap, ...historyKeymap]),
+        keymap.of([...defaultKeymap, ...historyKeymap, ...foldKeymap]),
         json(),
         jsonLinter,
         EditorView.lineWrapping,
@@ -256,6 +290,20 @@ export function CodeEditor({
       ),
     });
   }, [resolvedTheme]);
+
+  // Fold-all / unfold-all, driven by the toolbar via counter triggers. The
+  // initial 0 is ignored (same guard the tree uses) so mounting doesn't fold.
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view || !foldAllTrigger) return;
+    foldAll(view);
+  }, [foldAllTrigger]);
+
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view || !unfoldAllTrigger) return;
+    unfoldAll(view);
+  }, [unfoldAllTrigger]);
 
   return (
     <div

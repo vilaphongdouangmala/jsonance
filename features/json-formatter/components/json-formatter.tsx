@@ -14,6 +14,8 @@ export function JsonFormatter() {
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
   const [expandAllTrigger, setExpandAllTrigger] = useState<number>(0);
   const [collapseAllTrigger, setCollapseAllTrigger] = useState<number>(0);
+  const [foldAllTrigger, setFoldAllTrigger] = useState<number>(0);
+  const [unfoldAllTrigger, setUnfoldAllTrigger] = useState<number>(0);
 
   const { jsonInput, error, formatJson, minifyJson, handleInputChange } =
     useJsonFormatter();
@@ -47,12 +49,16 @@ export function JsonFormatter() {
     }
   };
 
+  // "Collapse All" / "Expand All" mean the tree in Preview mode and editor
+  // folding in Edit mode — same labels, different target.
   const handleExpandAll = () => {
-    setExpandAllTrigger((prev) => prev + 1);
+    if (isPreviewMode) setExpandAllTrigger((prev) => prev + 1);
+    else setUnfoldAllTrigger((prev) => prev + 1);
   };
 
   const handleCollapseAll = () => {
-    setCollapseAllTrigger((prev) => prev + 1);
+    if (isPreviewMode) setCollapseAllTrigger((prev) => prev + 1);
+    else setFoldAllTrigger((prev) => prev + 1);
   };
 
   const handleDataChange = (newData: JsonValue) => {
@@ -102,6 +108,8 @@ export function JsonFormatter() {
             <EditSection
               jsonInput={jsonInput}
               onInputChange={handleInputChange}
+              foldAllTrigger={foldAllTrigger}
+              unfoldAllTrigger={unfoldAllTrigger}
             />
           )}
         </div>
