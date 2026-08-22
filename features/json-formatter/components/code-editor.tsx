@@ -73,16 +73,21 @@ const baseTheme = EditorView.theme({
   // Fold-gutter arrows: the default glyphs render small and sit high against
   // the line-number text. Match the line height so they centre on the row,
   // and bump the size so the ▸/▾ is legible.
+  // Keep the fold element's box flush with the row (matching the line-number
+  // gutter) so their active-line backgrounds stay aligned. Size/position the
+  // glyph via its inner span so the element box is untouched.
   ".cm-foldGutter .cm-gutterElement": {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    cursor: "pointer",
+  },
+  ".cm-foldGutter .cm-gutterElement > span": {
     fontSize: "1.15rem",
     lineHeight: "1",
-    // The ▸/▾ glyph's visual weight sits below its box centre, so nudge it up
-    // to line up with the line-number digits.
-    paddingBottom: "3px",
-    cursor: "pointer",
+    // The ▸/▾ glyph's visual weight sits below its box centre; nudge just the
+    // glyph up to line up with the line-number digits (no layout shift).
+    transform: "translateY(-2px)",
   },
 });
 
