@@ -77,9 +77,11 @@ const baseTheme = EditorView.theme({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "0.9rem",
+    fontSize: "1.15rem",
     lineHeight: "1",
-    padding: "0 2px",
+    // The ▸/▾ glyph's visual weight sits below its box centre, so nudge it up
+    // to line up with the line-number digits.
+    paddingBottom: "3px",
     cursor: "pointer",
   },
 });
