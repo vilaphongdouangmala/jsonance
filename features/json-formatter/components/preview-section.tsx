@@ -8,7 +8,6 @@ import type { JsonValue } from "@/features/json-formatter/types/json";
 
 interface PreviewSectionProps {
   jsonInput: string;
-  formattedJson: string;
   onCopy: (value: string) => Promise<void> | void;
   expandAllTrigger?: number;
   collapseAllTrigger?: number;
@@ -18,7 +17,6 @@ interface PreviewSectionProps {
 
 export function PreviewSection({
   jsonInput,
-  formattedJson,
   onCopy,
   expandAllTrigger,
   collapseAllTrigger,
@@ -26,10 +24,9 @@ export function PreviewSection({
   isInlineEditEnabled = true,
 }: PreviewSectionProps) {
   const t = useTranslations();
-  const content = formattedJson || jsonInput;
-  const treeContainerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  if (!content.trim()) {
+  if (!jsonInput.trim()) {
     return (
       <div className="w-full h-[65vh] min-h-[300px] p-4 flex items-center justify-center text-muted-foreground">
         {t("placeholders.nothingToPreview")}
@@ -38,22 +35,17 @@ export function PreviewSection({
   }
 
   return (
-    <>
-      <div
-        ref={treeContainerRef}
-        className="h-[65vh] min-h-[300px] w-full overflow-auto"
-      >
-        <JsonTree
-          data={content}
-          className="w-full p-4"
-          onCopy={onCopy}
-          expandAllTrigger={expandAllTrigger}
-          collapseAllTrigger={collapseAllTrigger}
-          onDataChange={onDataChange}
-          isInlineEditEnabled={isInlineEditEnabled}
-        />
-      </div>
-      <ScrollToTop containerRef={treeContainerRef} />
-    </>
+    <div className="relative h-[65vh] min-h-[300px] w-full">
+      <JsonTree
+        data={jsonInput}
+        scrollRef={scrollRef}
+        onCopy={onCopy}
+        expandAllTrigger={expandAllTrigger}
+        collapseAllTrigger={collapseAllTrigger}
+        onDataChange={onDataChange}
+        isInlineEditEnabled={isInlineEditEnabled}
+      />
+      <ScrollToTop containerRef={scrollRef} />
+    </div>
   );
 }

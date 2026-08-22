@@ -7,7 +7,6 @@ export function useJsonFormatter() {
   const t = useTranslations();
   const [jsonInput, setJsonInput] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [formattedJson, setFormattedJson] = useState<string>("");
 
   const formatJson = useCallback(() => {
     try {
@@ -19,9 +18,7 @@ export function useJsonFormatter() {
       }
 
       const parsedJson = JSON.parse(jsonInput);
-      const formatted = JSON.stringify(parsedJson, null, 2);
-      setJsonInput(formatted);
-      setFormattedJson(formatted);
+      setJsonInput(JSON.stringify(parsedJson, null, 2));
       setError(null);
     } catch (err) {
       console.log((err as Error).message);
@@ -39,9 +36,7 @@ export function useJsonFormatter() {
       }
 
       const parsedJson = JSON.parse(jsonInput);
-      const minified = JSON.stringify(parsedJson);
-      setJsonInput(minified);
-      setFormattedJson(minified);
+      setJsonInput(JSON.stringify(parsedJson));
       setError(null);
     } catch (err) {
       console.log((err as Error).message);
@@ -49,21 +44,11 @@ export function useJsonFormatter() {
     }
   }, [jsonInput, t]);
 
+  // Just store the raw text. No per-keystroke parse/stringify: preview parses
+  // the current input on its own, and the editor lints on a debounce.
   const handleInputChange = useCallback(
     (value: string) => {
       setJsonInput(value);
-      try {
-        if (value.trim()) {
-          // Try to parse and format for preview mode
-          const parsed = JSON.parse(value);
-          setFormattedJson(JSON.stringify(parsed, null, 2));
-        } else {
-          setFormattedJson("");
-        }
-      } catch {
-        // If it's not valid JSON, just use the input as is for preview
-        setFormattedJson(value);
-      }
       if (error) setError(null);
     },
     [error]
@@ -72,7 +57,6 @@ export function useJsonFormatter() {
   return {
     jsonInput,
     error,
-    formattedJson,
     formatJson,
     minifyJson,
     handleInputChange,

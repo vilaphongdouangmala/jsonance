@@ -1,14 +1,15 @@
 "use client";
 
-import React, {
-  useState,
-  useCallback,
-  useMemo,
-  useEffect,
-  useRef,
-} from "react";
+import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { cn } from "@/lib/utils";
-import { JsonNode } from "./json-node";
+import { JsonRow } from "./json-row";
+import {
+  buildFlatNodes,
+  getVisibleNodes,
+  collectExpandablePaths,
+  type FlatNode,
+} from "@/features/json-formatter/utils/tree-model";
 import type {
   JsonValue,
   JsonObject,
@@ -22,12 +23,14 @@ interface JsonTreeProps {
   collapseAllTrigger?: number;
   onDataChange?: (newData: JsonValue) => void;
   isInlineEditEnabled?: boolean;
+  /** Shared scroll container ref (also used by ScrollToTop). */
+  scrollRef?: React.RefObject<HTMLDivElement | null>;
 }
 
-interface TreeState {
-  expandedNodes: Set<string>;
-  focusedNode: string | null;
-}
+const ROW_HEIGHT = 28; // px; must match the fixed row height below
+// Above this many expandable nodes, "Expand All" asks for confirmation before
+// materialising a huge visible list.
+const EXPAND_ALL_GUARD = 50_000;
 
 export const JsonTree: React.FC<JsonTreeProps> = ({
   data,
@@ -37,36 +40,16 @@ export const JsonTree: React.FC<JsonTreeProps> = ({
   collapseAllTrigger,
   onDataChange,
   isInlineEditEnabled = false,
+  scrollRef: externalScrollRef,
 }) => {
-  const [treeState, setTreeState] = useState<TreeState>({
-    expandedNodes: new Set([""]),
-    focusedNode: null,
-  });
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(
+    () => new Set([""])
+  );
+  const [focusedNode, setFocusedNode] = useState<string | null>(null);
+  const internalScrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = externalScrollRef ?? internalScrollRef;
 
-  const handleToggle = useCallback((path: string) => {
-    setTreeState((prev) => {
-      const newExpandedNodes = new Set(prev.expandedNodes);
-      if (newExpandedNodes.has(path)) {
-        newExpandedNodes.delete(path);
-      } else {
-        newExpandedNodes.add(path);
-      }
-      return {
-        ...prev,
-        expandedNodes: newExpandedNodes,
-      };
-    });
-  }, []);
-
-  const handleFocus = useCallback((path: string) => {
-    setTreeState((prev) => ({
-      ...prev,
-      focusedNode: path,
-    }));
-  }, []);
-
-  const parsedData = useMemo(() => {
+  const parsedData = useMemo<JsonValue | null>(() => {
     try {
       return typeof data === "string" ? JSON.parse(data) : data;
     } catch {
@@ -74,98 +57,105 @@ export const JsonTree: React.FC<JsonTreeProps> = ({
     }
   }, [data]);
 
-  // Function to collect all expandable paths
-  const collectAllPaths = useCallback(
-    (obj: JsonValue, currentPath: string[] = []): string[] => {
-      const paths: string[] = [];
-
-      if (typeof obj === "object" && obj !== null) {
-        const pathKey = currentPath.join(".");
-        if (pathKey !== "") paths.push(pathKey);
-
-        if (Array.isArray(obj)) {
-          obj.forEach((item, index) => {
-            const newPath = [...currentPath, index.toString()];
-            paths.push(...collectAllPaths(item, newPath));
-          });
-        } else {
-          Object.entries(obj as JsonObject).forEach(([key, value]) => {
-            const newPath = [...currentPath, key];
-            paths.push(...collectAllPaths(value, newPath));
-          });
-        }
-      }
-
-      return paths;
-    },
-    []
+  // One walk per document: every node with its canonical line number.
+  const allNodes = useMemo<FlatNode[]>(
+    () => (parsedData === null ? [] : buildFlatNodes(parsedData)),
+    [parsedData]
   );
 
-  // Handle expand all trigger
-  useEffect(() => {
-    if (expandAllTrigger && parsedData) {
-      const allPaths = collectAllPaths(parsedData);
-      setTreeState((prev) => ({
-        ...prev,
-        expandedNodes: new Set(["", ...allPaths]),
-      }));
-    }
-  }, [expandAllTrigger, parsedData, collectAllPaths]);
+  // Cheap linear derivation on each expand/collapse.
+  const visibleNodes = useMemo(
+    () => getVisibleNodes(allNodes, expandedNodes),
+    [allNodes, expandedNodes]
+  );
 
-  // Handle collapse all trigger
+  const virtualizer = useVirtualizer({
+    count: visibleNodes.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => ROW_HEIGHT,
+    overscan: 20,
+    getItemKey: (index) => visibleNodes[index].pathKey || "$root",
+  });
+
+  const handleToggle = useCallback(
+    (pathKey: string, recursive: boolean, expand: boolean) => {
+      setExpandedNodes((prev) => {
+        const next = new Set(prev);
+        if (!recursive) {
+          if (next.has(pathKey)) next.delete(pathKey);
+          else next.add(pathKey);
+          return next;
+        }
+        // Alt+click: expand/collapse this node and its whole subtree.
+        const prefix = pathKey === "" ? "" : pathKey + ".";
+        for (const node of allNodes) {
+          const inSubtree =
+            node.pathKey === pathKey ||
+            (node.pathKey + ".").startsWith(prefix);
+          if (inSubtree && node.isExpandable && node.childCount > 0) {
+            if (expand) next.add(node.pathKey);
+            else next.delete(node.pathKey);
+          }
+        }
+        return next;
+      });
+    },
+    [allNodes]
+  );
+
+  const handleFocus = useCallback((pathKey: string) => {
+    setFocusedNode(pathKey);
+  }, []);
+
+  // Expand all (guarded on very large documents).
   useEffect(() => {
-    if (collapseAllTrigger) {
-      setTreeState((prev) => ({
-        ...prev,
-        expandedNodes: new Set([""]),
-      }));
+    if (!expandAllTrigger || allNodes.length === 0) return;
+    const paths = collectExpandablePaths(allNodes);
+    if (
+      paths.length > EXPAND_ALL_GUARD &&
+      typeof window !== "undefined" &&
+      !window.confirm(
+        `This will expand ${paths.length.toLocaleString()} nodes and may briefly freeze the page. Continue?`
+      )
+    ) {
+      return;
     }
+    setExpandedNodes(new Set(["", ...paths]));
+  }, [expandAllTrigger, allNodes]);
+
+  useEffect(() => {
+    if (!collapseAllTrigger) return;
+    setExpandedNodes(new Set([""]));
   }, [collapseAllTrigger]);
 
-  // Handle value changes from inline editing
   const handleValueChange = useCallback(
     (path: string[], newValue: JsonValue) => {
-      if (!onDataChange || !parsedData) return;
-
-      // Create a deep copy of the data and update the specific path
-      const updateNestedValue = (
+      if (!onDataChange || parsedData === null) return;
+      const update = (
         obj: JsonValue,
         pathArray: string[],
         value: JsonValue
       ): JsonValue => {
-        if (pathArray.length === 0) {
-          return value;
-        }
-
+        if (pathArray.length === 0) return value;
         const [head, ...tail] = pathArray;
         if (Array.isArray(obj)) {
-          const newArray = [...obj];
-          const index = parseInt(head, 10);
-          newArray[index] = updateNestedValue(obj[index], tail, value);
-          return newArray;
-        } else if (obj && typeof obj === "object") {
-          const objAsRecord = obj as JsonObject;
-          const newObj = { ...objAsRecord };
-          newObj[head] = updateNestedValue(objAsRecord[head], tail, value);
-          return newObj;
-        } else {
-          // If obj is a primitive, we can't update nested values
-          return obj;
+          const arr = [...obj];
+          const idx = parseInt(head, 10);
+          arr[idx] = update(obj[idx], tail, value);
+          return arr;
         }
+        if (obj && typeof obj === "object") {
+          const rec = obj as JsonObject;
+          return { ...rec, [head]: update(rec[head], tail, value) };
+        }
+        return obj;
       };
-
-      const updatedData = updateNestedValue(parsedData, path, newValue);
-      onDataChange(updatedData);
+      onDataChange(update(parsedData, path, newValue));
     },
     [onDataChange, parsedData]
   );
 
-  // Keyboard navigation for the container
-  const handleContainerKeyDown = useCallback(() => {
-    // Focus management will be handled by individual nodes
-  }, []);
-
-  if (!parsedData) {
+  if (parsedData === null) {
     return (
       <div className="p-4 text-center text-muted-foreground">
         Invalid JSON data
@@ -173,26 +163,55 @@ export const JsonTree: React.FC<JsonTreeProps> = ({
     );
   }
 
+  const lastLine = allNodes.length ? allNodes[allNodes.length - 1].line : 1;
+  const gutterWidth = `${Math.max(2, String(lastLine).length) + 1.5}ch`;
+  const items = virtualizer.getVirtualItems();
+
   return (
     <div
-      ref={containerRef}
-      className={cn("font-mono text-sm", className)}
-      onKeyDown={handleContainerKeyDown}
+      ref={scrollRef}
+      className={cn("relative h-full w-full overflow-auto font-mono", className)}
       role="tree"
       aria-label="JSON Tree View"
     >
-      <JsonNode
-        data={parsedData}
-        level={0}
-        path={[]}
-        expandedNodes={treeState.expandedNodes}
-        focusedNode={treeState.focusedNode}
-        onToggle={handleToggle}
-        onFocus={handleFocus}
-        onCopy={onCopy}
-        onValueChange={handleValueChange}
-        isInlineEditEnabled={isInlineEditEnabled}
-      />
+      <div
+        style={{ height: virtualizer.getTotalSize(), position: "relative" }}
+      >
+        {items.map((item) => {
+          const node = visibleNodes[item.index];
+          return (
+            <div
+              key={item.key}
+              data-index={item.index}
+              className="absolute left-0 top-0 flex w-full"
+              style={{
+                height: ROW_HEIGHT,
+                transform: `translateY(${item.start}px)`,
+              }}
+            >
+              {/* Canonical JSON line number gutter (shares the row => no drift) */}
+              <div
+                className="shrink-0 select-none border-r bg-muted/40 px-2 text-right text-xs leading-[28px] text-muted-foreground"
+                style={{ width: gutterWidth }}
+              >
+                {node.line}
+              </div>
+              <div className="min-w-0 flex-1">
+                <JsonRow
+                  node={node}
+                  isExpanded={expandedNodes.has(node.pathKey)}
+                  isFocused={focusedNode === node.pathKey}
+                  onToggle={handleToggle}
+                  onFocus={handleFocus}
+                  onCopy={onCopy}
+                  onValueChange={handleValueChange}
+                  isInlineEditEnabled={isInlineEditEnabled}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

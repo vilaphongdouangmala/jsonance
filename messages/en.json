@@ -9,7 +9,7 @@
     "minify": "Minify",
     "copy": "Copy",
     "copyKey": "Copy Key",
-    "copyKeyAria": "Copy key '{key}'",
+    "copyKeyAria": "Copy key {key}",
     "copyValueAria": "Copy {type}",
     "editValueAria": "Edit value"
   },
